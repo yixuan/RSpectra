@@ -7,7 +7,7 @@ Author@R: c(
     person("Yixuan", "Qiu", , "yixuan.qiu@cos.name", c("aut", "cre")),
     person("Jiali", "Mei", , "vermouthmjl@gmail.com", "aut",
            comment = "Function interface of matrix operation"),
-    person("Gael", "Guennebaud"), , "gael.guennebaud@inria.fr", "ctb",
+    person("Gael", "Guennebaud", , "gael.guennebaud@inria.fr", "ctb",
            comment = "Eigenvalue solvers from the 'Eigen' library"),
     person("Jitse", "Niesen", , "jitse@maths.leeds.ac.uk", "ctb",
            comment = "Eigenvalue solvers from the 'Eigen' library")
