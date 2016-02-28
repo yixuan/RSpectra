@@ -1,7 +1,7 @@
 .onLoad <- function(libname, pkgname) {
-    library.dynam("rARPACK", pkgname, libname);
+    library.dynam("RSpectra", pkgname, libname);
 }
 
 .onUnload <- function(libpath) {
-    library.dynam.unload("rARPACK", libpath);
+    library.dynam.unload("RSpectra", libpath);
 }

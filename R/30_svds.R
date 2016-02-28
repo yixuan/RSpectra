@@ -6,9 +6,9 @@
 ##' singular values and the corresponding singular vectors.
 ##' It is also called the Truncated Singular Value Decomposition
 ##' since it only contains a subset of the whole singular triplets.
-##' 
+##'
 ##' Currently \code{svds()} supports matrices of the following classes:
-##' 
+##'
 ##' \tabular{ll}{
 ##'   \code{matrix}     \tab The most commonly used matrix type,
 ##'                          defined in \strong{base} package.\cr
@@ -25,7 +25,7 @@
 ##' Note that when \eqn{A} is symmetric,
 ##' SVD reduces to eigen decomposition, so you may consider using
 ##' \code{\link{eigs}()} instead.
-##' 
+##'
 ##' @param A The matrix whose truncated SVD is to be computed.
 ##' @param k Number of singular values requested.
 ##' @param nu Number of left singular vectors to be computed. This must
@@ -49,7 +49,7 @@
 ##' \item{\code{tol}}{Precision parameter. Default is 1e-10.}
 ##' \item{\code{maxitr}}{Maximum number of iterations. Default is 1000.}
 ##' }
-##' 
+##'
 ##' @return A list with the following components:
 ##' \item{d}{A vector of the computed singular values.}
 ##' \item{u}{An \code{m} by \code{nu} matrix whose columns contain
@@ -63,7 +63,7 @@
 ##' \item{nops}{Number of matrix-vector multiplications used.}
 ##' @author Yixuan Qiu <\url{http://statr.me}>
 ##' @seealso \code{\link[base]{eigen}()}, \code{\link[base]{svd}()},
-##' \code{\link[rARPACK]{eigs}()}.
+##' \code{\link[RSpectra]{eigs}()}.
 ##'
 ##' @export
 ##' @rdname svds
@@ -74,16 +74,16 @@
 ##' k = 5
 ##' set.seed(111)
 ##' A = matrix(rnorm(m * n), m)
-##' 
+##'
 ##' svds(A, k)
 ##' svds(t(A), k, nu = 0, nv = 3)
-##' 
+##'
 ##' ## Sparse matrices
 ##' library(Matrix)
 ##' A[sample(m * n, m * n / 2)] = 0
 ##' Asp1 = as(A, "dgCMatrix")
 ##' Asp2 = as(A, "dgRMatrix")
-##' 
+##'
 ##' svds(Asp1, k)
 ##' svds(Asp2, k, nu = 0, nv = 0)
 ##'

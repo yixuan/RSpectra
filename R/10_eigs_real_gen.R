@@ -8,7 +8,7 @@ eigs.real_gen <- function(A, n, k, which, sigma, opts, ..., mattype,
         if (nrow(A) != ncol(A) | nrow(A) != n)
             stop("'A' must be a square matrix of size n")
     }
-    
+
     # eigs() is not suitable for small matrices
     if (n < 3)
         stop("dimension of 'A' must be at least 3")
@@ -88,7 +88,7 @@ eigs.real_gen <- function(A, n, k, which, sigma, opts, ..., mattype,
     # Update parameters from 'opts' argument
     arpack.param[names(opts)] = opts
     arpack.param$which = EIGS_RULE[arpack.param$which]
-    
+
     # Any other arguments passed to C++ code, for example use_lower and fun_args
     arpack.param = c(arpack.param, as.list(extra_args))
 
@@ -107,7 +107,7 @@ eigs.real_gen <- function(A, n, k, which, sigma, opts, ..., mattype,
                 as.integer(n), as.integer(k),
                 as.list(arpack.param),
                 as.integer(MAT_TYPE[mattype]),
-                PACKAGE = "rARPACK")
+                PACKAGE = "RSpectra")
 
     return(res)
 }

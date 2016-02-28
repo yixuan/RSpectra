@@ -7,9 +7,9 @@
 ##' Users can specify the selection criteria by argument
 ##' \code{which}, e.g., choosing the \eqn{k} largest or smallest
 ##' eigenvalues and the corresponding eigenvectors.
-##' 
+##'
 ##' Currently \code{eigs()} supports matrices of the following classes:
-##' 
+##'
 ##' \tabular{ll}{
 ##'   \code{matrix}     \tab The most commonly used matrix type,
 ##'                          defined in \strong{base} package.\cr
@@ -26,7 +26,7 @@
 ##'                          \eqn{f(x)=Ax}{f(x) = A * x}. See section
 ##'                          \strong{Function Interface} for details.
 ##' }
-##' 
+##'
 ##' \code{eigs_sym()} assumes the matrix is symmetric,
 ##' and only the lower triangle (or upper triangle, which is
 ##' controlled by the argument \code{lower}) is used for
@@ -34,10 +34,10 @@
 ##' real, and in some cases reduces the workload. One exception is when
 ##' \code{A} is a function, in which case the user is responsible for the
 ##' symmetry of the operator.
-##' 
+##'
 ##' \code{eigs_sym()} supports "matrix", "dgeMatrix", "dgCMatrix", "dgRMatrix"
 ##' and "function" typed matrices.
-##' 
+##'
 ##' @param A The matrix whose eigenvalues/vectors are to be computed.
 ##'          It can also be a function which receives a vector \eqn{x}
 ##'          and calculates \eqn{Ax}{A * x}.
@@ -82,10 +82,10 @@
 ##' \code{eigs()} with matrix type "matrix", "dgeMatrix", "dgCMatrix"
 ##' and "dgRMatrix" can use "LM",
 ##' "SM", "LR", "SR", "LI" and "SI".
-##' 
+##'
 ##' \code{eigs_sym()}, and \code{eigs()} with matrix type "dsyMatrix"
 ##' can use "LM", "SM", "LA", "SA" and "BE".
-##' 
+##'
 ##' The \code{opts} argument is a list that can supply any of the
 ##' following parameters:
 ##'
@@ -102,15 +102,15 @@
 ##' \item{\code{retvec}}{Whether to compute eigenvectors. If FALSE,
 ##'                      only calculate and return eigenvalues.}
 ##' }
-##' 
+##'
 ##' @section Shift-And-Invert Mode:
 ##' The \code{sigma} argument is used in the shift-and-invert mode.
-##' 
+##'
 ##' When \code{sigma} is not \code{NULL}, the selection criteria specified
 ##' by argument \code{which} will apply to
-##' 
+##'
 ##' \deqn{\frac{1}{\lambda-\sigma}}{1/(\lambda-\sigma)}
-##' 
+##'
 ##' where \eqn{\lambda}'s are the eigenvalues of \eqn{A}. This mode is useful
 ##' when user wants to find eigenvalues closest to a given number.
 ##' For example, if \eqn{\sigma=0}, then \code{which = "LM"} will select the
@@ -122,22 +122,22 @@
 ##' eigenvalues rather than small ones. More explanation of the
 ##' shift-and-invert mode can be found in the SciPy document,
 ##' \url{http://docs.scipy.org/doc/scipy/reference/tutorial/arpack.html}.
-##' 
+##'
 ##' @section Function Interface:
 ##' The matrix \eqn{A} can be specified through a function with
 ##' the definition
-##' 
+##'
 ##' \preformatted{function(x, args)
 ##' {
 ##'     ## should return A \%*\% x
 ##' }}
-##' 
+##'
 ##' which receives a vector \code{x} as an argument and returns a vector
 ##' of the same length. The function should have the effect of calculating
 ##' \eqn{Ax}{A * x}, and extra arguments can be passed in through the
 ##' \code{args} parameter. In \code{eigs()}, user should also provide
 ##' the dimension of the implicit matrix through the argument \code{n}.
-##' 
+##'
 ##' @return A list of converged eigenvalues and eigenvectors.
 ##' \item{values}{Computed eigenvalues.}
 ##' \item{vectors}{Computed eigenvectors. \code{vectors[, j]} corresponds to \code{values[j]}.}
@@ -145,10 +145,10 @@
 ##' \item{niter}{Number of iterations used in the computation.}
 ##' \item{nops}{Number of matrix operations used in the computation.}
 ##' @author Yixuan Qiu \url{http://statr.me}
-##' 
+##'
 ##'         Jiali Mei \email{vermouthmjl@@gmail.com}
 ##' @seealso \code{\link[base]{eigen}()}, \code{\link[base]{svd}()},
-##'          \code{\link[rARPACK]{svds}()}
+##'          \code{\link[RSpectra]{svds}()}
 ##'
 ##' @export
 ##' @rdname eigs
@@ -157,40 +157,40 @@
 ##' library(Matrix)
 ##' n = 20
 ##' k = 5
-##' 
+##'
 ##' ## general matrices have complex eigenvalues
 ##' set.seed(111)
 ##' A1 = matrix(rnorm(n^2), n)  ## class "matrix"
 ##' A2 = Matrix(A1)             ## class "dgeMatrix"
-##' 
+##'
 ##' eigs(A1, k)
 ##' eigs(A2, k, opts = list(retvec = FALSE))  ## eigenvalues only
-##' 
+##'
 ##' ## sparse matrices
 ##' A1[sample(n^2, n^2 / 2)] = 0
 ##' A3 = as(A1, "dgCMatrix")
 ##' A4 = as(A1, "dgRMatrix")
-##' 
+##'
 ##' eigs(A3, k)
 ##' eigs(A4, k)
-##' 
+##'
 ##' ## function interface
 ##' f = function(x, args)
 ##' {
 ##'     as.numeric(args %*% x)
 ##' }
 ##' eigs(f, k, n = n, args = A3)
-##' 
+##'
 ##' ## symmetric matrices have real eigenvalues
 ##' A5 = crossprod(A1)
 ##' eigs_sym(A5, k)
-##' 
+##'
 ##' ## find the smallest (in absolute value) k eigenvalues of A5
 ##' eigs_sym(A5, k, which = "SM")
-##' 
+##'
 ##' ## another way to do this: use the sigma argument
 ##' eigs_sym(A5, k, sigma = 0)
-##' 
+##'
 ##' ## The results should be the same,
 ##' ## but the latter method is far more stable on large matrices
 eigs <- function(A, k, which = "LM", sigma = NULL,

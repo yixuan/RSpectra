@@ -1,4 +1,4 @@
-library(rARPACK)
+library(RSpectra)
 library(Matrix)
 n = 1000
 p = 500
@@ -59,7 +59,7 @@ output = function(res)
     {
         cat("ERROR")
     } else cat(res$res)
-    
+
     if(!is.null(res$warn)) cat(" (with warning)")
     cat("\n", rep(" ", 34), sprintf("(%f seconds)\n", res$time), sep = "")
 }
