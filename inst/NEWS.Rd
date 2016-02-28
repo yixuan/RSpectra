@@ -1,5 +1,21 @@
 \name{NEWS}
-\title{News for Package "rARPACK"}
+\title{News for Package "RSpectra"}
+
+\section{Changes in RSpectra version 0.11-0}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item New package to supersede \pkg{rARPACK} to avoid name confusion.
+      \item Imported from \pkg{rARPACK} 0.10-0.
+    }
+  }
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item Improved numerical stability.
+      \item Fixed convergence failure for matrices that have repeated
+            eigenvalues.
+    }
+  }
+}
 
 \section{Changes in rARPACK version 0.10-0}{
   \subsection{BUG FIXES}{
