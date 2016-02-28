@@ -1,14 +1,14 @@
-#ifndef C_INTERFACE_H
-#define C_INTERFACE_H
+#ifndef MATOPS_C_H
+#define MATOPS_C_H
 
-#include <ArpackC.h>
+#include <SpectraC.h>
 
 class CMatProd: public MatProd
 {
 private:
-    mat_op op;
+    mat_op    op;
     const int n;
-    void *data;
+    void*     data;
 public:
     CMatProd(mat_op op_, int n_, void *data_) :
         op(op_),
@@ -24,9 +24,9 @@ public:
 class CRealShift: public RealShift
 {
 private:
-    mat_op op;
+    mat_op    op;
     const int n;
-    void *data;
+    void*     data;
 public:
     CRealShift(mat_op op_, int n_, void *data_) :
         op(op_),
@@ -42,9 +42,9 @@ public:
 class CComplexShift: public ComplexShift
 {
 private:
-    mat_op op;
+    mat_op    op;
     const int n;
-    void *data;
+    void*     data;
 public:
     CComplexShift(mat_op op_, int n_, void *data_) :
         op(op_),
@@ -58,4 +58,4 @@ public:
 };
 
 
-#endif // C_INTERFACE_H
+#endif // MATOPS_C_H
