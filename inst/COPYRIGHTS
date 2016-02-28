@@ -1,0 +1,16 @@
+For the original ARPACK library included in rARPACK (<= 0.7-0),
+
+Copyright (c) 1996-2008 Rice University.  
+Developed by D.C. Sorensen, R.B. Lehoucq, C. Yang, and K. Maschhoff.
+All rights reserved.
+
+For the modified version of ARPACK included in rARPACK (<= 0.7-0),
+i.e. arpack-ng,
+
+Copyright (c) 2001-2011 - Scilab Enterprises
+Updated by Allan Cornet, Sylvestre Ledru.
+
+Copyright (c) 2010 - Jordi Gutiérrez Hermoso (Octave patch)
+
+Copyright (c) 2007 - Sébastien Fabbro (gentoo patch)
+

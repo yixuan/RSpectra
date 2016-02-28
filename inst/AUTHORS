@@ -1,0 +1,33 @@
+For rARPACK of version <= 0.7-0,
+the packge included the source code of arpack-ng
+(http://forge.scilab.org/index.php/p/arpack-ng/)
+which derived from the ARPACK library
+(http://www.caam.rice.edu/software/ARPACK/).
+
+The original authors of ARPACK were
+    Rich Lehoucq
+    Kristi Maschhoff
+    Danny Sorensen
+    Chao Yang 
+
+The development team admins of arpack-ng were
+    Sylvestre Ledru
+    Jordi Gutiérrez Hermoso
+    Andreas Kloeckner
+
+The original version of files
+    src/MatOp_function.h
+    src/MatOp_function.cpp
+    R/25_eigs_function.R
+were contributed by Jiali Mei.
+
+
+
+For rARPACK of version >= 0.8-0,
+the package included the Spectra library
+(https://github.com/yixuan/spectra/)
+to replace arpack-ng. Spectra was written by Yixuan Qiu.
+
+
+
+Other part of this package was written by Yixuan Qiu.
