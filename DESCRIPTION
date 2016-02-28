@@ -3,7 +3,7 @@ Type: Package
 Title: Solvers for Large Scale Eigenvalue and SVD Problems
 Version: 0.11-0
 Date: 2016-02-28
-Author@R: c(
+Authors@R: c(
     person("Yixuan", "Qiu", , "yixuan.qiu@cos.name", c("aut", "cre")),
     person("Jiali", "Mei", , "vermouthmjl@gmail.com", "aut",
            comment = "Function interface of matrix operation"),
@@ -11,8 +11,7 @@ Author@R: c(
            comment = "Eigenvalue solvers from the 'Eigen' library"),
     person("Jitse", "Niesen", , "jitse@maths.leeds.ac.uk", "ctb",
            comment = "Eigenvalue solvers from the 'Eigen' library")
-)
-Maintainer: Yixuan Qiu <yixuan.qiu@cos.name>
+    )
 Description: R interface to the 'Spectra' library
     <http://yixuan.cos.name/spectra/> for large scale eigenvalue and SVD
     problems. It is typically used to compute a few
@@ -23,7 +22,7 @@ Description: R interface to the 'Spectra' library
     to calculate the largest k singular values and corresponding
     singular vectors of a real matrix. Matrices can be given in either dense
     or sparse form.
-License: MPL (≥ 2)
+License: MPL (>= 2)
 URL: https://github.com/yixuan/RSpectra
 BugReports: https://github.com/yixuan/RSpectra/issues
 Depends:
