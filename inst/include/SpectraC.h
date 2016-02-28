@@ -1,5 +1,5 @@
-#ifndef ARPACKC_H
-#define ARPACKC_H
+#ifndef SPECTRAC_H
+#define SPECTRAC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -7,14 +7,14 @@ extern "C" {
 
 
 
-/* Options related to ARPACK */
+/* Options related to Spectra */
 typedef struct {
     int rule;     /* 0-LM, 1-LR, 2-LI, 3-LA, 4-SM, 5-SR, 6-SI, 7-SA, 8-BE  */
     int ncv;      /* number of Ritz values in iteration */
     double tol;   /* precision parameter */
     int maxitr;   /* maximum number of iterations */
     int retvec;   /* 0 - do not return eigenvectors, 1 - return eigenvectors */
-} arpack_opts;
+} spectra_opts;
 
 /* Function to represent matrix operation */
 typedef void (*mat_op)(double *x_in, double *y_out, int n, void *data);
@@ -36,14 +36,14 @@ typedef void (*mat_op)(double *x_in, double *y_out, int n, void *data);
  */
 void eigs_sym_c(
     mat_op op, int n, int k,
-    const arpack_opts *opts, void *data,
+    const spectra_opts *opts, void *data,
     int *nconv, int *niter, int *nops,
     double *evals, double *evecs, int *info
 );
 
 typedef void (*eigs_sym_c_funtype)(
         mat_op op, int n, int k,
-        const arpack_opts *opts, void *data,
+        const spectra_opts *opts, void *data,
         int *nconv, int *niter, int *nops,
         double *evals, double *evecs, int *info
 );
@@ -54,14 +54,14 @@ typedef void (*eigs_sym_c_funtype)(
  */
 void eigs_sym_shift_c(
     mat_op op, int n, int k, double sigma,
-    const arpack_opts *opts, void *data,
+    const spectra_opts *opts, void *data,
     int *nconv, int *niter, int *nops,
     double *evals, double *evecs, int *info
 );
 
 typedef void (*eigs_sym_shift_c_funtype)(
         mat_op op, int n, int k, double sigma,
-        const arpack_opts *opts, void *data,
+        const spectra_opts *opts, void *data,
         int *nconv, int *niter, int *nops,
         double *evals, double *evecs, int *info
 );
@@ -74,14 +74,14 @@ typedef void (*eigs_sym_shift_c_funtype)(
  */
 void eigs_gen_c(
     mat_op op, int n, int k,
-    const arpack_opts *opts, void *data,
+    const spectra_opts *opts, void *data,
     int *nconv, int *niter, int *nops,
     double *evals_r, double *evals_i, double *evecs_r, double *evecs_i, int *info
 );
 
 typedef void (*eigs_gen_c_funtype)(
         mat_op op, int n, int k,
-        const arpack_opts *opts, void *data,
+        const spectra_opts *opts, void *data,
         int *nconv, int *niter, int *nops,
         double *evals_r, double *evals_i, double *evecs_r, double *evecs_i, int *info
 );
@@ -92,14 +92,14 @@ typedef void (*eigs_gen_c_funtype)(
  */
 void eigs_gen_shift_c(
     mat_op op, int n, int k, double sigmar, double sigmai,
-    const arpack_opts *opts, void *data,
+    const spectra_opts *opts, void *data,
     int *nconv, int *niter, int *nops,
     double *evals_r, double *evals_i, double *evecs_r, double *evecs_i, int *info
 );
 
 typedef void (*eigs_gen_shift_c_funtype)(
         mat_op op, int n, int k, double sigmar, double sigmai,
-        const arpack_opts *opts, void *data,
+        const spectra_opts *opts, void *data,
         int *nconv, int *niter, int *nops,
         double *evals_r, double *evals_i, double *evecs_r, double *evecs_i, int *info
 );
@@ -109,4 +109,4 @@ typedef void (*eigs_gen_shift_c_funtype)(
 }
 #endif
 
-#endif /* ARPACKC_H */
+#endif /* SPECTRAC_H */
