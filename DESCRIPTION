@@ -31,3 +31,4 @@ Imports:
     Matrix (>= 1.1-0),
     Rcpp (>= 0.11.5)
 LinkingTo: Rcpp, RcppEigen (>= 0.3.2.2.0)
+RoxygenNote: 5.0.1
