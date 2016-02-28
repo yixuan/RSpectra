@@ -26,24 +26,8 @@ RcppExport SEXP svds_sym(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
 
     MatProd *op = get_mat_prod_op(A_mat_r, n, n, params_list_r, mattype);
 
-    // Prepare initial residuals
-    double *init_resid;
-    #include "rands.h"
-    if(n <= rands_len)
-    {
-        init_resid = rands;
-    } else {
-        init_resid = new double[n];
-        double *coef_pntr = init_resid;
-        for(int i = 0; i < n / rands_len; i++, coef_pntr += rands_len)
-        {
-            std::copy(rands, rands + rands_len, coef_pntr);
-        }
-        std::copy(rands, rands + n % rands_len, coef_pntr);
-    }
-
     SymEigsSolver<double, LARGEST_MAGN, MatProd> eigs(op, k, ncv);
-    eigs.init(init_resid);
+    eigs.init();
     int nconv = eigs.compute(maxitr, tol);
     if(nconv < k)
         Rcpp::warning("only %d singular values converged, less than k = %d", nconv, k);
@@ -85,9 +69,6 @@ RcppExport SEXP svds_sym(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
     if(nu > 0)  u_ret = u;  else  u_ret = R_NilValue;
     if(nv > 0)  v_ret = v;  else  v_ret = R_NilValue;
 
-    if(n > rands_len)
-        delete [] init_resid;
-
     delete op;
 
     return Rcpp::List::create(
@@ -123,7 +104,6 @@ RcppExport SEXP svds_gen(SEXP A_mat_r, SEXP m_scalar_r, SEXP n_scalar_r,
     int maxitr   = as<int>(params_svds["maxitr"]);
     int mattype  = as<int>(mattype_scalar_r);
 
-    int dim = std::min(m, n);
     // Fail the case of function-typed matrix
     if(mattype == FUNCTION)
         mattype = -99;
@@ -136,24 +116,8 @@ RcppExport SEXP svds_gen(SEXP A_mat_r, SEXP m_scalar_r, SEXP n_scalar_r,
     else
         op = new SVDWideOp(op_orig);
 
-    // Prepare initial residuals
-    double *init_resid;
-    #include "rands.h"
-    if(dim <= rands_len)
-    {
-        init_resid = rands;
-    } else {
-        init_resid = new double[dim];
-        double *coef_pntr = init_resid;
-        for(int i = 0; i < dim / rands_len; i++, coef_pntr += rands_len)
-        {
-            std::copy(rands, rands + rands_len, coef_pntr);
-        }
-        std::copy(rands, rands + dim % rands_len, coef_pntr);
-    }
-
     SymEigsSolver<double, LARGEST_ALGE, MatProd> eigs(op, k, ncv);
-    eigs.init(init_resid);
+    eigs.init();
     int nconv = eigs.compute(maxitr, tol);
     if(nconv < k)
         Rcpp::warning("only %d singular values converged, less than k = %d", nconv, k);
@@ -206,9 +170,6 @@ RcppExport SEXP svds_gen(SEXP A_mat_r, SEXP m_scalar_r, SEXP n_scalar_r,
 
     if(nu > 0)  u_ret = u;  else  u_ret = R_NilValue;
     if(nv > 0)  v_ret = v;  else  v_ret = R_NilValue;
-
-    if(dim > rands_len)
-        delete [] init_resid;
 
     delete op;
     delete op_orig;

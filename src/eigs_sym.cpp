@@ -1,6 +1,8 @@
 #include <RcppEigen.h>
 #include <SymEigs.h>
+#include <SpectraC.h>
 #include "matops.h"
+#include "matops_c.h"
 
 using namespace Spectra;
 using Rcpp::as;
@@ -14,7 +16,7 @@ enum SOLVER_TYPE {
 /************************ Macros to generate code ************************/
 
 #define EIG_COMMON_CODE                                                        \
-eigs.init(init_resid);                                                         \
+eigs.init();                                                                   \
 nconv = eigs.compute(maxitr, tol);                                             \
 if(nconv < nev)                                                                \
     Rcpp::warning("only %d eigenvalue(s) converged, less than k = %d",         \
@@ -76,29 +78,10 @@ switch(rule)                                                                   \
 Rcpp::RObject run_eigs_sym(MatProd* op, int n, int nev, int ncv, int rule,
                            int maxitr, double tol, bool retvec)
 {
-    // Prepare initial residuals
-    double *init_resid;
-    #include "rands.h"
-    if(n <= rands_len)
-    {
-        init_resid = rands;
-    } else {
-        init_resid = new double[n];
-        double *coef_pntr = init_resid;
-        for(int i = 0; i < n / rands_len; i++, coef_pntr += rands_len)
-        {
-            std::copy(rands, rands + rands_len, coef_pntr);
-        }
-        std::copy(rands, rands + n % rands_len, coef_pntr);
-    }
-
     Rcpp::RObject evals, evecs;
     int nconv = 0, niter = 0, nops = 0;
 
     EIG_CODE_GENERATOR(REGULAR, MatProd)
-
-    if(n > rands_len)
-        delete [] init_resid;
 
     return Rcpp::List::create(
         Rcpp::Named("values")  = evals,
@@ -144,29 +127,10 @@ RcppExport SEXP eigs_sym(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
 Rcpp::RObject run_eigs_shift_sym(RealShift* op, int n, int nev, int ncv, int rule,
                                  double sigma, int maxitr, double tol, bool retvec)
 {
-    // Prepare initial residuals
-    double *init_resid;
-    #include "rands.h"
-    if(n <= rands_len)
-    {
-        init_resid = rands;
-    } else {
-        init_resid = new double[n];
-        double *coef_pntr = init_resid;
-        for(int i = 0; i < n / rands_len; i++, coef_pntr += rands_len)
-        {
-            std::copy(rands, rands + rands_len, coef_pntr);
-        }
-        std::copy(rands, rands + n % rands_len, coef_pntr);
-    }
-
     Rcpp::RObject evals, evecs;
     int nconv = 0, niter = 0, nops = 0;
 
     EIG_CODE_GENERATOR(REAL_SHIFT, RealShift)
-
-    if(n > rands_len)
-        delete [] init_resid;
 
     return Rcpp::List::create(
         Rcpp::Named("values")  = evals,
@@ -209,11 +173,9 @@ RcppExport SEXP eigs_shift_sym(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
 
 
 /************************ C interface ************************/
-#include "c_interface.h"
-
 void eigs_sym_c(
     mat_op op, int n, int k,
-    const arpack_opts *opts, void *data,
+    const spectra_opts *opts, void *data,
     int *nconv, int *niter, int *nops,
     double *evals, double *evecs, int *info
 )
@@ -246,7 +208,7 @@ void eigs_sym_c(
 
 void eigs_sym_shift_c(
     mat_op op, int n, int k, double sigma,
-    const arpack_opts *opts, void *data,
+    const spectra_opts *opts, void *data,
     int *nconv, int *niter, int *nops,
     double *evals, double *evecs, int *info
 )
