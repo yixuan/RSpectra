@@ -66,7 +66,7 @@ MatProd* get_mat_prod_op(SEXP mat, int nrow, int ncol, SEXP extra_arg, int mat_t
     return op;
 }
 
-RealShift* eigs_sym_get_real_shift_op(SEXP mat, int n, SEXP extra_arg, int mat_type)
+RealShift* get_real_shift_op_sym(SEXP mat, int n, SEXP extra_arg, int mat_type)
 {
     RealShift *op;
 
@@ -125,7 +125,7 @@ RealShift* eigs_sym_get_real_shift_op(SEXP mat, int n, SEXP extra_arg, int mat_t
     return op;
 }
 
-RealShift* eigs_gen_get_real_shift_op(SEXP mat, int n, SEXP extra_arg, int mat_type)
+RealShift* get_real_shift_op_gen(SEXP mat, int n, SEXP extra_arg, int mat_type)
 {
     RealShift *op;
 

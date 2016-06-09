@@ -158,7 +158,7 @@ RcppExport SEXP eigs_shift_sym(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
     int mattype  = as<int>(mattype_scalar_r);
     double sigma = as<double>(params_rcpp["sigma"]);
 
-    RealShift *op = eigs_sym_get_real_shift_op(A_mat_r, n, params_list_r, mattype);
+    RealShift *op = get_real_shift_op_sym(A_mat_r, n, params_list_r, mattype);
 
     Rcpp::RObject res = run_eigs_shift_sym(op, n, nev, ncv, rule, sigma, maxitr, tol, retvec);
 

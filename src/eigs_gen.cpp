@@ -161,7 +161,7 @@ RcppExport SEXP eigs_real_shift_gen(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar
     int mattype   = as<int>(mattype_scalar_r);
     double sigmar = as<double>(params_rcpp["sigmar"]);
 
-    RealShift *op = eigs_gen_get_real_shift_op(A_mat_r, n, params_list_r, mattype);
+    RealShift *op = get_real_shift_op_gen(A_mat_r, n, params_list_r, mattype);
     Rcpp::RObject res = run_eigs_real_shift_gen(op, n, nev, ncv, rule, sigmar, maxitr, tol, retvec);
 
     delete op;
