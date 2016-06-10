@@ -110,7 +110,7 @@ RcppExport SEXP eigs_sym(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
     bool retvec  = as<bool>(params_rcpp["retvec"]);
     int mattype  = as<int>(mattype_scalar_r);
 
-    MatProd *op = get_mat_prod_op(A_mat_r, n, n, params_list_r, mattype);
+    MatProd* op = get_mat_prod_op(A_mat_r, n, n, params_list_r, mattype);
     Rcpp::RObject res = run_eigs_sym(op, n, nev, ncv, rule, maxitr, tol, retvec);
 
     delete op;
@@ -158,7 +158,7 @@ RcppExport SEXP eigs_shift_sym(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
     int mattype  = as<int>(mattype_scalar_r);
     double sigma = as<double>(params_rcpp["sigma"]);
 
-    RealShift *op = get_real_shift_op_sym(A_mat_r, n, params_list_r, mattype);
+    RealShift* op = get_real_shift_op_sym(A_mat_r, n, params_list_r, mattype);
 
     Rcpp::RObject res = run_eigs_shift_sym(op, n, nev, ncv, rule, sigma, maxitr, tol, retvec);
 
@@ -175,9 +175,9 @@ RcppExport SEXP eigs_shift_sym(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
 /************************ C interface ************************/
 void eigs_sym_c(
     mat_op op, int n, int k,
-    const spectra_opts *opts, void *data,
-    int *nconv, int *niter, int *nops,
-    double *evals, double *evecs, int *info
+    const spectra_opts* opts, void* data,
+    int* nconv, int* niter, int* nops,
+    double* evals, double* evecs, int* info
 )
 {
     BEGIN_RCPP
@@ -208,9 +208,9 @@ void eigs_sym_c(
 
 void eigs_sym_shift_c(
     mat_op op, int n, int k, double sigma,
-    const spectra_opts *opts, void *data,
-    int *nconv, int *niter, int *nops,
-    double *evals, double *evecs, int *info
+    const spectra_opts* opts, void* data,
+    int* nconv, int* niter, int* nops,
+    double* evals, double* evecs, int* info
 )
 {
     BEGIN_RCPP

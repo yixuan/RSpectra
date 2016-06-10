@@ -12,8 +12,8 @@ private:
     typedef Eigen::Map<Eigen::VectorXd> MapVec;
     typedef Eigen::LDLT<Eigen::MatrixXd> LDLTSolver;
 
-    MapMat mat;
-    const int n;
+    MapMat     mat;
+    const int  n;
     const char uplo;
     LDLTSolver solver;
 
@@ -42,7 +42,7 @@ public:
     }
 
     // y_out = inv(A - sigma * I) * x_in
-    void perform_op(double *x_in, double *y_out)
+    void perform_op(double* x_in, double* y_out)
     {
         MapVec x(x_in, n);
         MapVec y(y_out, n);

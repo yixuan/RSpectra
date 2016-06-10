@@ -13,8 +13,8 @@ private:
     typedef Eigen::SparseLU< Eigen::SparseMatrix<double, Eigen::ColMajor> > SpLUSolver;
 
     // Map to Eigen sparse matrix
-    MapSpMat mat;
-    const int n;
+    MapSpMat   mat;
+    const int  n;
     SpLUSolver solver;
 
 public:
@@ -36,7 +36,7 @@ public:
     }
 
     // y_out = inv(A - sigma * I) * x_in
-    void perform_op(double *x_in, double *y_out)
+    void perform_op(double* x_in, double* y_out)
     {
         MapVec x(x_in, n);
         MapVec y(y_out, n);

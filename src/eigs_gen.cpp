@@ -113,7 +113,7 @@ RcppExport SEXP eigs_gen(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
     bool retvec  = as<bool>(params_rcpp["retvec"]);
     int mattype  = as<int>(mattype_scalar_r);
 
-    MatProd *op = get_mat_prod_op(A_mat_r, n, n, params_list_r, mattype);;
+    MatProd* op = get_mat_prod_op(A_mat_r, n, n, params_list_r, mattype);;
     Rcpp::RObject res = run_eigs_gen(op, n, nev, ncv, rule, maxitr, tol, retvec);
 
     delete op;
@@ -161,7 +161,7 @@ RcppExport SEXP eigs_real_shift_gen(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar
     int mattype   = as<int>(mattype_scalar_r);
     double sigmar = as<double>(params_rcpp["sigmar"]);
 
-    RealShift *op = get_real_shift_op_gen(A_mat_r, n, params_list_r, mattype);
+    RealShift* op = get_real_shift_op_gen(A_mat_r, n, params_list_r, mattype);
     Rcpp::RObject res = run_eigs_real_shift_gen(op, n, nev, ncv, rule, sigmar, maxitr, tol, retvec);
 
     delete op;
@@ -210,7 +210,7 @@ RcppExport SEXP eigs_complex_shift_gen(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_sca
     double sigmar = as<double>(params_rcpp["sigmar"]);
     double sigmai = as<double>(params_rcpp["sigmai"]);
 
-    ComplexShift *op = get_complex_shift_op(A_mat_r, n, params_list_r, mattype);
+    ComplexShift* op = get_complex_shift_op(A_mat_r, n, params_list_r, mattype);
     Rcpp::RObject res = run_eigs_complex_shift_gen(op, n, nev, ncv, rule, sigmar, sigmai,
                                                    maxitr, tol, retvec);
 
@@ -227,9 +227,9 @@ RcppExport SEXP eigs_complex_shift_gen(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_sca
 /************************ C interface ************************/
 void eigs_gen_c(
     mat_op op, int n, int k,
-    const spectra_opts *opts, void *data,
-    int *nconv, int *niter, int *nops,
-    double *evals_r, double *evals_i, double *evecs_r, double *evecs_i, int *info
+    const spectra_opts* opts, void* data,
+    int* nconv, int* niter, int* nops,
+    double* evals_r, double* evals_i, double* evecs_r, double* evecs_i, int* info
 )
 {
     BEGIN_RCPP
@@ -270,9 +270,9 @@ void eigs_gen_c(
 
 void eigs_gen_shift_c(
     mat_op op, int n, int k, double sigmar, double sigmai,
-    const spectra_opts *opts, void *data,
-    int *nconv, int *niter, int *nops,
-    double *evals_r, double *evals_i, double *evecs_r, double *evecs_i, int *info
+    const spectra_opts* opts, void* data,
+    int* nconv, int* niter, int* nops,
+    double* evals_r, double* evals_i, double* evecs_r, double* evecs_i, int* info
 )
 {
     BEGIN_RCPP

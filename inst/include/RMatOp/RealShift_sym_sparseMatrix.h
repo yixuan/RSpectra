@@ -13,9 +13,9 @@ private:
     typedef Eigen::SimplicialLDLT< Eigen::SparseMatrix<double, Eigen::ColMajor> > SpLDLSolver;
 
     // Map to Eigen sparse matrix
-    MapSpMat mat;
-    const int n;
-    const char uplo;
+    MapSpMat    mat;
+    const int   n;
+    const char  uplo;
     SpLDLSolver solver;
 
 public:
@@ -39,7 +39,7 @@ public:
     }
 
     // y_out = inv(A - sigma * I) * x_in
-    void perform_op(double *x_in, double *y_out)
+    void perform_op(double* x_in, double* y_out)
     {
         MapVec x(x_in, n);
         MapVec y(y_out, n);

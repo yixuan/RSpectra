@@ -9,9 +9,9 @@ class MatProd_function: public MatProd
 private:
     Rcpp::Function A;
     Rcpp::Function Atrans;
-    const int nrow;
-    const int ncol;
-    Rcpp::RObject args;
+    const int      nrow;
+    const int      ncol;
+    Rcpp::RObject  args;
 
 public:
     MatProd_function(SEXP mat_, SEXP trans_, const int nrow_, const int ncol_, SEXP args_) :
@@ -26,7 +26,7 @@ public:
     int cols() const { return ncol; }
 
     // y_out = A * x_in
-    void perform_op(double *x_in, double *y_out)
+    void perform_op(double* x_in, double* y_out)
     {
         Rcpp::NumericVector x(ncol);
         std::copy(x_in, x_in + ncol, x.begin());
@@ -39,7 +39,7 @@ public:
     }
 
     // y_out = A' * x_in
-    void perform_tprod(double *x_in, double *y_out)
+    void perform_tprod(double* x_in, double* y_out)
     {
         Rcpp::NumericVector x(nrow);
         std::copy(x_in, x_in + nrow, x.begin());

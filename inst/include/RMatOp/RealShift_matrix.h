@@ -12,9 +12,9 @@ private:
     typedef Eigen::Map<Eigen::VectorXd> MapVec;
     typedef Eigen::PartialPivLU<Eigen::MatrixXd> LUSolver;
 
-    MapMat mat;
+    MapMat    mat;
     const int n;
-    LUSolver solver;
+    LUSolver  solver;
 
 public:
     RealShift_matrix(SEXP mat_, const int nrow_) :
@@ -31,7 +31,7 @@ public:
     }
 
     // y_out = inv(A - sigma * I) * x_in
-    void perform_op(double *x_in, double *y_out)
+    void perform_op(double* x_in, double* y_out)
     {
         MapVec x(x_in, n);
         MapVec y(y_out, n);

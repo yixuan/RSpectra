@@ -12,7 +12,7 @@ private:
     typedef Eigen::Map<Eigen::VectorXd> MapVec;
 
     // Map to Eigen sparse matrix
-    MapSpMat mat;
+    MapSpMat  mat;
     const int nrow;
     const int ncol;
 
@@ -27,14 +27,14 @@ public:
     int cols() const { return ncol; }
 
     // y_out = A * x_in
-    void perform_op(double *x_in, double *y_out)
+    void perform_op(double* x_in, double* y_out)
     {
         MapVec x(x_in, ncol);
         MapVec y(y_out, nrow);
         y.noalias() = mat * x;
     }
 
-    void perform_tprod(double *x_in, double *y_out)
+    void perform_tprod(double* x_in, double* y_out)
     {
         MapVec x(x_in, nrow);
         MapVec y(y_out, ncol);

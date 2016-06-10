@@ -16,8 +16,8 @@ private:
     typedef Eigen::VectorXcd ComplexVector;
     typedef Eigen::PartialPivLU<ComplexMatrix> ComplexSolver;
 
-    MapMat mat;
-    const int n;
+    MapMat        mat;
+    const int     n;
     ComplexSolver solver;
     ComplexVector x_cache;
 
@@ -40,7 +40,7 @@ public:
     }
 
     // y_out = inv(A - sigma * I) * x_in
-    void perform_op(double *x_in, double *y_out)
+    void perform_op(double* x_in, double* y_out)
     {
         x_cache.real() = MapVec(x_in, n);
         MapVec y(y_out, n);

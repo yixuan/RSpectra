@@ -124,7 +124,7 @@ namespace Spectra {
 ///     int rows() { return 10; }
 ///     int cols() { return 10; }
 ///     // y_out = M * x_in
-///     void perform_op(double *x_in, double *y_out)
+///     void perform_op(double* x_in, double* y_out)
 ///     {
 ///         for(int i = 0; i < rows(); i++)
 ///         {
@@ -784,7 +784,7 @@ public:
 ///     void set_shift(double sigma) { sigma_ = sigma; }
 ///     // y_out = inv(A - sigma * I) * x_in
 ///     // inv(A - sigma * I) = diag(1/(1-sigma), 1/(2-sigma), ...)
-///     void perform_op(double *x_in, double *y_out)
+///     void perform_op(double* x_in, double* y_out)
 ///     {
 ///         for(int i = 0; i < rows(); i++)
 ///         {

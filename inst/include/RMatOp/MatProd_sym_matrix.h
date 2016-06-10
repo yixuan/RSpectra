@@ -9,11 +9,11 @@ class MatProd_sym_matrix: public MatProd
 {
 private:
     const double* mat_ptr;
-    const int n;
-    const char uplo;
-    const double BLAS_alpha;
-    const int BLAS_one;
-    const double BLAS_zero;
+    const int     n;
+    const char    uplo;
+    const double  BLAS_alpha;
+    const int     BLAS_one;
+    const double  BLAS_zero;
 
 public:
     MatProd_sym_matrix(SEXP mat_, const int nrow_, const char uplo_ = 'L') :
@@ -29,7 +29,7 @@ public:
     int cols() const { return n; }
 
     // y_out = A * x_in
-    void perform_op(double *x_in, double *y_out)
+    void perform_op(double* x_in, double* y_out)
     {
         F77_CALL(dsymv)(&uplo, &n,
                         &BLAS_alpha, mat_ptr, &n,
@@ -37,7 +37,7 @@ public:
                         y_out, &BLAS_one);
     }
 
-    void perform_tprod(double *x_in, double *y_out)
+    void perform_tprod(double* x_in, double* y_out)
     {
         perform_op(x_in, y_out);
     }

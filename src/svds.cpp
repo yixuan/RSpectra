@@ -24,7 +24,7 @@ RcppExport SEXP svds_sym(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
     int maxitr   = as<int>(params_svds["maxitr"]);
     int mattype  = as<int>(mattype_scalar_r);
 
-    MatProd *op = get_mat_prod_op(A_mat_r, n, n, params_list_r, mattype);
+    MatProd* op = get_mat_prod_op(A_mat_r, n, n, params_list_r, mattype);
 
     SymEigsSolver<double, LARGEST_MAGN, MatProd> eigs(op, k, ncv);
     eigs.init();
@@ -57,7 +57,7 @@ RcppExport SEXP svds_sym(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
             d[i] = -d[i];
             if(i < nv)
             {
-                double *ptr = &v(0, i);
+                double* ptr = &v(0, i);
                 std::transform(ptr, ptr + n, ptr, std::negate<double>());
             }
         }
@@ -105,9 +105,9 @@ RcppExport SEXP svds_gen(SEXP A_mat_r, SEXP m_scalar_r, SEXP n_scalar_r,
     int mattype  = as<int>(mattype_scalar_r);
 
     // Operation for original matrix
-    MatProd *op_orig = get_mat_prod_op(A_mat_r, m, n, params_list_r, mattype);
+    MatProd* op_orig = get_mat_prod_op(A_mat_r, m, n, params_list_r, mattype);
     // Operation for SVD
-    MatProd *op;
+    MatProd* op;
     if(m > n)
         op = new SVDTallOp(op_orig);
     else

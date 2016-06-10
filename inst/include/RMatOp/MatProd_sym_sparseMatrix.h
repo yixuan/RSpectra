@@ -12,8 +12,8 @@ private:
     typedef Eigen::Map<Eigen::VectorXd> MapVec;
 
     // Map to Eigen sparse matrix
-    MapSpMat mat;
-    const int n;
+    MapSpMat   mat;
+    const int  n;
     const char uplo;
 
 public:
@@ -27,7 +27,7 @@ public:
     int cols() const { return n; }
 
     // y_out = A * x_in
-    void perform_op(double *x_in, double *y_out)
+    void perform_op(double* x_in, double* y_out)
     {
         MapVec x(x_in, n);
         MapVec y(y_out, n);
@@ -38,7 +38,7 @@ public:
             y.noalias() = mat.template selfadjointView<Eigen::Upper>() * x;
     }
 
-    void perform_tprod(double *x_in, double *y_out)
+    void perform_tprod(double* x_in, double* y_out)
     {
         perform_op(x_in, y_out);
     }
