@@ -1,4 +1,4 @@
-svds.real_gen <- function(A, k, nu, nv, opts, mattype, extra_args = list())
+svds_real_gen <- function(A, k, nu, nv, opts, mattype, extra_args = list())
 {
     if (mattype == "function")
     {

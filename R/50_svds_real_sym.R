@@ -1,4 +1,4 @@
-svds.real_sym <- function(A, k, nu, nv, opts, mattype, extra_args = list())
+svds_real_sym <- function(A, k, nu, nv, opts, mattype, extra_args = list())
 {
     n = nrow(A)
 
@@ -34,19 +34,19 @@ svds.real_sym <- function(A, k, nu, nv, opts, mattype, extra_args = list())
     if (nu < 0 | nv < 0 | nu > k | nv > k)
         stop("'nu' and 'nv' must satisfy 0 <= nu <= k and 0 <= nv <= k")
 
-    # Arguments to be passed to ARPACK
-    arpack.param = list(ncv = min(n, max(2 * k + 1, 20)),
-                        tol = 1e-10,
-                        maxitr = 1000)
+    # Arguments to be passed to Spectra
+    spectra.param = list(ncv = min(n, max(2 * k + 1, 20)),
+                         tol = 1e-10,
+                         maxitr = 1000)
 
     # Update parameters from 'opts' argument
-    arpack.param[names(opts)] = opts
+    spectra.param[names(opts)] = opts
 
     # Any other arguments passed to C++ code, for example use_lower
-    arpack.param = c(arpack.param, as.list(extra_args))
+    spectra.param = c(spectra.param, as.list(extra_args))
 
     # Check the value of 'ncv'
-    if (arpack.param$ncv <= k | arpack.param$ncv > n)
+    if (spectra.param$ncv <= k | spectra.param$ncv > n)
         stop("'opts$ncv' must be > k and <= min(nrow(A), ncol(A))")
 
     # Call the C++ function
@@ -54,7 +54,7 @@ svds.real_sym <- function(A, k, nu, nv, opts, mattype, extra_args = list())
                 A,
                 as.integer(n),
                 as.integer(k), as.integer(nu), as.integer(nv),
-                as.list(arpack.param),
+                as.list(spectra.param),
                 as.integer(MAT_TYPE[mattype]),
                 PACKAGE = "RSpectra")
 

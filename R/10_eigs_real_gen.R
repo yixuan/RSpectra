@@ -1,5 +1,4 @@
-eigs.real_gen <- function(A, n, k, which, sigma, opts, ..., mattype,
-                          extra_args = list())
+eigs_real_gen <- function(A, n, k, which, sigma, opts, mattype, extra_args = list())
 {
     # Check whether 'A' is a square matrix
     # Skip this step if A is a function
