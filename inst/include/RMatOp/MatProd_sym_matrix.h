@@ -25,8 +25,8 @@ public:
         BLAS_zero(0.0)
     {}
 
-    int rows() { return n; }
-    int cols() { return n; }
+    int rows() const { return n; }
+    int cols() const { return n; }
 
     // y_out = A * x_in
     void perform_op(double *x_in, double *y_out)

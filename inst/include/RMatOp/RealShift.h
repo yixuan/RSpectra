@@ -4,8 +4,8 @@
 class RealShift
 {
 public:
-    virtual int rows() = 0;
-    virtual int cols() = 0;
+    virtual int rows() const = 0;
+    virtual int cols() const = 0;
 
     virtual void set_shift(double sigma) = 0;
 

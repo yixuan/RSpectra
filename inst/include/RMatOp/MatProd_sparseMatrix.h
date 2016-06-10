@@ -23,8 +23,8 @@ public:
         ncol(ncol_)
     {}
 
-    int rows() { return nrow; }
-    int cols() { return ncol; }
+    int rows() const { return nrow; }
+    int cols() const { return ncol; }
 
     // y_out = A * x_in
     void perform_op(double *x_in, double *y_out)

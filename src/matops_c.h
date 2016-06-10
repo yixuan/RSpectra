@@ -15,8 +15,8 @@ public:
         n(n_),
         data(data_)
     {}
-    int rows() { return n; }
-    int cols() { return n; }
+    int rows() const { return n; }
+    int cols() const { return n; }
     void perform_op(double *x_in, double *y_out) { op(x_in, y_out, n, data); }
     void perform_tprod(double *x_in, double *y_out) {}
 };
@@ -33,8 +33,8 @@ public:
         n(n_),
         data(data_)
     {}
-    int rows() { return n; }
-    int cols() { return n; }
+    int rows() const { return n; }
+    int cols() const { return n; }
     void set_shift(double sigma) {}
     void perform_op(double *x_in, double *y_out) { op(x_in, y_out, n, data); }
 };
@@ -51,8 +51,8 @@ public:
         n(n_),
         data(data_)
     {}
-    int rows() { return n; }
-    int cols() { return n; }
+    int rows() const { return n; }
+    int cols() const { return n; }
     void set_shift(double sigmar, double sigmai) {}
     void perform_op(double *x_in, double *y_out) { op(x_in, y_out, n, data); }
 };

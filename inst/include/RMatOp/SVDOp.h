@@ -22,8 +22,8 @@ public:
         delete [] work;
     }
 
-    int rows() { return dim; }
-    int cols() { return dim; }
+    int rows() const { return dim; }
+    int cols() const { return dim; }
 
     // y_out = A'A * x_in
     void perform_op(double *x_in, double *y_out)
@@ -56,8 +56,8 @@ public:
         delete [] work;
     }
 
-    int rows() { return dim; }
-    int cols() { return dim; }
+    int rows() const { return dim; }
+    int cols() const { return dim; }
 
     // y_out = AA' * x_in
     void perform_op(double *x_in, double *y_out)

@@ -25,13 +25,13 @@ public:
         uplo(uplo_)
     {}
 
-    int rows() { return n; }
-    int cols() { return n; }
+    int rows() const { return n; }
+    int cols() const { return n; }
 
     void set_shift(double sigma)
     {
         solver.setShift(-sigma);
-        
+
         if(uplo == 'L')
             solver.compute(mat.template selfadjointView<Eigen::Lower>());
         else

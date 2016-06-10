@@ -23,15 +23,15 @@ public:
         uplo(uplo_)
     {}
 
-    int rows() { return n; }
-    int cols() { return n; }
+    int rows() const { return n; }
+    int cols() const { return n; }
 
     // y_out = A * x_in
     void perform_op(double *x_in, double *y_out)
     {
         MapVec x(x_in, n);
         MapVec y(y_out, n);
-        
+
         if(uplo == 'L')
             y.noalias() = mat.template selfadjointView<Eigen::Lower>() * x;
         else

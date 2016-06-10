@@ -15,7 +15,7 @@ private:
 //  const MapMat mat;
     const int nrow;
     const int ncol;
-    
+
     const double BLAS_alpha;
     const int BLAS_one;
     const double BLAS_zero;
@@ -34,8 +34,8 @@ public:
 
     {}
 
-    int rows() { return nrow; }
-    int cols() { return ncol; }
+    int rows() const { return nrow; }
+    int cols() const { return ncol; }
 
     // y_out = A * x_in
     void perform_op(double *x_in, double *y_out)

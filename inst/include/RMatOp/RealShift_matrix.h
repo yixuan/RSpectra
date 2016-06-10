@@ -22,8 +22,8 @@ public:
         n(nrow_)
     {}
 
-    int rows() { return n; }
-    int cols() { return n; }
+    int rows() const { return n; }
+    int cols() const { return n; }
 
     void set_shift(double sigma)
     {
