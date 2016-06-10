@@ -24,8 +24,7 @@ eigs_real_sym <- function(A, n, k, which, sigma, opts, mattype, extra_args = lis
     }
 
     # Matrix will be passed to C++, so we need to check the type.
-    # ARPACK only supports matrices in float or double, so we need
-    # to do the conversion if A is stored other than double.
+    # Convert the matrix type if A is stored other than double.
     #
     # However, for dsyMatrix matrices defined in Matrix package,
     # they are always double, so we can omit this check.
@@ -48,31 +47,31 @@ eigs_real_sym <- function(A, n, k, which, sigma, opts, mattype, extra_args = lis
         sigma = Re(sigma)
     }
 
-    # Arguments to be passed to ARPACK
-    arpack.param = list(which = which,
-                        ncv = min(n, max(2 * k + 1, 20)),
-                        tol = 1e-10,
-                        maxitr = 1000,
-                        retvec = TRUE,
-                        sigma = sigma)
+    # Arguments to be passed to Spectra
+    spectra.param = list(which = which,
+                         ncv = min(n, max(2 * k + 1, 20)),
+                         tol = 1e-10,
+                         maxitr = 1000,
+                         retvec = TRUE,
+                         sigma = sigma)
 
     # Check the value of 'which'
     eigenv.type = c("LM", "SM", "LA", "SA", "BE")
-    if (!(arpack.param$which %in% eigenv.type))
+    if (!(spectra.param$which %in% eigenv.type))
     {
         stop(sprintf("argument 'which' must be one of\n%s",
                      paste(eigenv.type, collapse = ", ")))
     }
 
     # Update parameters from 'opts' argument
-    arpack.param[names(opts)] = opts
-    arpack.param$which = EIGS_RULE[arpack.param$which]
+    spectra.param[names(opts)] = opts
+    spectra.param$which = EIGS_RULE[spectra.param$which]
 
     # Any other arguments passed to C++ code, for example use_lower and fun_args
-    arpack.param = c(arpack.param, as.list(extra_args))
+    spectra.param = c(spectra.param, as.list(extra_args))
 
     # Check the value of 'ncv'
-    if (arpack.param$ncv <= k | arpack.param$ncv > n)
+    if (spectra.param$ncv <= k | spectra.param$ncv > n)
         stop("'opts$ncv' must be > k and <= nrow(A)")
 
     # Call the C++ function
@@ -83,7 +82,7 @@ eigs_real_sym <- function(A, n, k, which, sigma, opts, mattype, extra_args = lis
     res = .Call(fun,
                 A,
                 as.integer(n), as.integer(k),
-                as.list(arpack.param),
+                as.list(spectra.param),
                 as.integer(MAT_TYPE[mattype]),
                 PACKAGE = "RSpectra")
 

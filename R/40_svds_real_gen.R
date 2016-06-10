@@ -24,8 +24,7 @@ svds_real_gen <- function(A, k, nu, nv, opts, mattype, extra_args = list())
     }
 
     # Matrix will be passed to C++, so we need to check the type.
-    # ARPACK only supports matrices in float or double, so we need
-    # to do the conversion if A is stored other than double.
+    # Convert the matrix type if A is stored other than double.
     #
     # However, for sparse matrices defined in Matrix package,
     # they are always double, so we can omit this check.

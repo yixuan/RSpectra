@@ -118,7 +118,7 @@
 ##' eigenvalues of \eqn{A} that have the smallest magnitude. The result of
 ##' using \code{which = "LM", sigma = 0} will be the same as
 ##' \code{which = "SM"}, but the former one is preferable
-##' in that ARPACK is good at finding large
+##' in that \code{eigs()} is good at finding large
 ##' eigenvalues rather than small ones. More explanation of the
 ##' shift-and-invert mode can be found in the SciPy document,
 ##' \url{http://docs.scipy.org/doc/scipy/reference/tutorial/arpack.html}.
