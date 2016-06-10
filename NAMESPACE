@@ -20,6 +20,7 @@ S3method(svds, dgeMatrix)
 S3method(svds, dgCMatrix)
 S3method(svds, dgRMatrix)
 S3method(svds, dsyMatrix)
+S3method(svds, "function")
 
 export(eigs)
 export(eigs_sym)

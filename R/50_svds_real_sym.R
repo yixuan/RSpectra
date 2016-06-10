@@ -1,5 +1,4 @@
-svds.real_sym <- function(A, k, nu, nv, opts, ..., mattype,
-                          extra_args = list())
+svds.real_sym <- function(A, k, nu, nv, opts, mattype, extra_args = list())
 {
     n = nrow(A)
 

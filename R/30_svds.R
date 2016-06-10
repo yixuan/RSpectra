@@ -87,47 +87,63 @@
 ##' svds(Asp1, k)
 ##' svds(Asp2, k, nu = 0, nv = 0)
 ##'
+##' ## Function interface
+##'
+##' Af = function(x, args)
+##' {
+##'     as.numeric(args %*% x)
+##' }
+##'
+##' Atf = function(x, args)
+##' {
+##'     as.numeric(crossprod(args, x))
+##' }
+##'
+##' svds(Af, k, Atrans = Atf, dim = c(m, n), args = Asp1)
+##'
 svds <- function(A, k, nu = k, nv = k, opts = list(), ...)
     UseMethod("svds")
 
 ##' @rdname svds
 ##' @export
-svds.matrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
+svds.matrix <- function(A, k, nu = k, nv = k, opts = list())
 {
     fun = if(isSymmetric(A)) svds.real_sym else svds.real_gen
-    fun(A, k, nu, nv, opts, ..., mattype = "matrix")
+    fun(A, k, nu, nv, opts, mattype = "matrix")
 }
 
 ##' @rdname svds
 ##' @export
-svds.dgeMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
+svds.dgeMatrix <- function(A, k, nu = k, nv = k, opts = list())
 {
     fun = if(isSymmetric(A)) svds.real_sym else svds.real_gen
-    fun(A, k, nu, nv, opts, ..., mattype = "dgeMatrix")
+    fun(A, k, nu, nv, opts, mattype = "dgeMatrix")
 }
 
 ##' @rdname svds
 ##' @export
-svds.dgCMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
+svds.dgCMatrix <- function(A, k, nu = k, nv = k, opts = list())
 {
     fun = if(isSymmetric(A)) svds.real_sym else svds.real_gen
-    fun(A, k, nu, nv, opts, ..., mattype = "dgCMatrix")
+    fun(A, k, nu, nv, opts, mattype = "dgCMatrix")
 }
 
 ##' @rdname svds
 ##' @export
-svds.dgRMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
-    svds.real_gen(A, k, nu, nv, opts, ..., mattype = "dgRMatrix")
+svds.dgRMatrix <- function(A, k, nu = k, nv = k, opts = list())
+    svds.real_gen(A, k, nu, nv, opts, mattype = "dgRMatrix")
 
 ##' @rdname svds
 ##' @export
-svds.dsyMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
-    svds.real_sym(A, k, nu, nv, opts, ..., mattype = "dsyMatrix",
+svds.dsyMatrix <- function(A, k, nu = k, nv = k, opts = list())
+    svds.real_sym(A, k, nu, nv, opts, mattype = "dsyMatrix",
                   extra_args = list(use_lower = (A@uplo == "L")))
 
 ##' @rdname svds
 ##' @export
-svds.function <- function(A, k, nu = k, nv = k, opts = list(), ...,
-                          Atrans, m, n, args = NULL)
-    svds.real_gen(A, k, nu, nv, opts, ..., mattype = "function",
-                  extra_args = list(Atrans = Atrans, m = m, n = n, fun_args = args))
+svds.function <- function(A, k, nu = k, nv = k, opts = list(),
+                          Atrans, dim, args = NULL)
+    svds.real_gen(A, k, nu, nv, opts, mattype = "function",
+                  extra_args = list(Atrans   = Atrans,
+                                    dim      = dim,
+                                    fun_args = args))

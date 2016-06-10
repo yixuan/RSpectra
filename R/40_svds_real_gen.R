@@ -1,10 +1,9 @@
-svds.real_gen <- function(A, k, nu, nv, opts, ..., mattype,
-                          extra_args = list())
+svds.real_gen <- function(A, k, nu, nv, opts, mattype, extra_args = list())
 {
     if (mattype == "function")
     {
-        m = extra_args$m
-        n = extra_args$n
+        m = as.integer(extra_args$dim[1])
+        n = as.integer(extra_args$dim[2])
     } else {
         m = nrow(A)
         n = ncol(A)

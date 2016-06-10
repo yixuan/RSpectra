@@ -104,9 +104,6 @@ RcppExport SEXP svds_gen(SEXP A_mat_r, SEXP m_scalar_r, SEXP n_scalar_r,
     int maxitr   = as<int>(params_svds["maxitr"]);
     int mattype  = as<int>(mattype_scalar_r);
 
-    // Fail the case of function-typed matrix
-    if(mattype == FUNCTION)
-        mattype = -99;
     // Operation for original matrix
     MatProd *op_orig = get_mat_prod_op(A_mat_r, m, n, params_list_r, mattype);
     // Operation for SVD
