@@ -1,6 +1,17 @@
 \name{NEWS}
 \title{News for Package "RSpectra"}
 
+\section{Changes in RSpectra version 0.12-0}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item Now \code{svds()} supports user-defined implicit matrix that is
+            specified by two functions, \code{A} and \code{Atrans}, which
+            calculate the matrix multiplication and transpose multiplication
+            respectively.
+    }
+  }
+}
+
 \section{Changes in RSpectra version 0.11-0}{
   \subsection{NEW FEATURES}{
     \itemize{
@@ -68,7 +79,8 @@
       \item Support for implicit matrix, contributed by Jiali Mei.
             User can supply a function \code{FUN} rather than an explicit
             matrix to \code{eigs()}, and the eigenvalues/eigenvectors of this
-            operator will be computed. \code{FUN(x, args)} must return a vector of the same length as \code{x}.
+            operator will be computed. \code{FUN(x, args)} must return a vector
+            of the same length as \code{x}.
       \item \code{eigs()} will test the symmetry of matrix before actual
             computation, since symmetric matrices can guarantee real
             eigenvalues and eigenvectors, and the numerical result is more
