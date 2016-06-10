@@ -53,8 +53,9 @@ MatProd* get_mat_prod_op(SEXP mat, int nrow, int ncol, SEXP extra_arg, int mat_t
         break;
     case FUNCTION:
         {
+        SEXP trans    = args["Atrans"];
         SEXP fun_args = args["fun_args"];
-        op = new MatProd_function(mat, nrow, fun_args);
+        op = new MatProd_function(mat, trans, nrow, ncol, fun_args);
         }
         break;
     default:
