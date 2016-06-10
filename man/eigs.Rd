@@ -14,29 +14,24 @@
 \usage{
 eigs(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 
-\method{eigs}{matrix}(A, k, which = "LM", sigma = NULL, opts = list(),
-  ...)
+\method{eigs}{matrix}(A, k, which = "LM", sigma = NULL, opts = list())
 
-\method{eigs}{dgeMatrix}(A, k, which = "LM", sigma = NULL, opts = list(),
-  ...)
+\method{eigs}{dgeMatrix}(A, k, which = "LM", sigma = NULL, opts = list())
 
-\method{eigs}{dgCMatrix}(A, k, which = "LM", sigma = NULL, opts = list(),
-  ...)
+\method{eigs}{dgCMatrix}(A, k, which = "LM", sigma = NULL, opts = list())
 
-\method{eigs}{dgRMatrix}(A, k, which = "LM", sigma = NULL, opts = list(),
-  ...)
+\method{eigs}{dgRMatrix}(A, k, which = "LM", sigma = NULL, opts = list())
 
-\method{eigs}{dsyMatrix}(A, k, which = "LM", sigma = NULL, opts = list(),
-  ...)
+\method{eigs}{dsyMatrix}(A, k, which = "LM", sigma = NULL, opts = list())
 
 \method{eigs}{function}(A, k, which = "LM", sigma = NULL, opts = list(),
-  ..., n = NULL, args = NULL)
+  n = NULL, args = NULL)
 
 eigs_sym(A, k, which = "LM", sigma = NULL, opts = list(),
    lower = TRUE, ...)
 
 \method{eigs_sym}{function}(A, k, which = "LM", sigma = NULL,
-  opts = list(), lower = TRUE, ..., n = NULL, args = NULL)
+  opts = list(), lower = TRUE, n = NULL, args = NULL)
 }
 \arguments{
 \item{A}{The matrix whose eigenvalues/vectors are to be computed.
@@ -58,14 +53,14 @@ dimension of the implicit matrix. See section
 \strong{Function Interface} for details.}
 
 \item{args}{Only used when \code{A} is a function. This argument
-will be passed to the \code{A} function containing any
-extra data. See section \strong{Function Interface}
-for details.}
+will be passed to the \code{A} function when it is called.
+See section \strong{Function Interface} for details.}
 
 \item{lower}{For symmetric matrices, should the lower triangle
 or upper triangle be used.}
 
-\item{\dots}{Currently not used.}
+\item{\dots}{Arguments for specialized S3 function calls, for example
+\code{lower}, \code{n} and \code{args}.}
 }
 \value{
 A list of converged eigenvalues and eigenvectors.
@@ -175,7 +170,7 @@ largest values of \eqn{1/|\lambda|}, which turns out to select
 eigenvalues of \eqn{A} that have the smallest magnitude. The result of
 using \code{which = "LM", sigma = 0} will be the same as
 \code{which = "SM"}, but the former one is preferable
-in that ARPACK is good at finding large
+in that \code{eigs()} is good at finding large
 eigenvalues rather than small ones. More explanation of the
 shift-and-invert mode can be found in the SciPy document,
 \url{http://docs.scipy.org/doc/scipy/reference/tutorial/arpack.html}.
@@ -210,7 +205,7 @@ A2 = Matrix(A1)             ## class "dgeMatrix"
 eigs(A1, k)
 eigs(A2, k, opts = list(retvec = FALSE))  ## eigenvalues only
 
-## sparse matrices
+## Sparse matrices
 A1[sample(n^2, n^2 / 2)] = 0
 A3 = as(A1, "dgCMatrix")
 A4 = as(A1, "dgRMatrix")
@@ -218,21 +213,21 @@ A4 = as(A1, "dgRMatrix")
 eigs(A3, k)
 eigs(A4, k)
 
-## function interface
+## Function interface
 f = function(x, args)
 {
     as.numeric(args \%*\% x)
 }
 eigs(f, k, n = n, args = A3)
 
-## symmetric matrices have real eigenvalues
+## Symmetric matrices have real eigenvalues
 A5 = crossprod(A1)
 eigs_sym(A5, k)
 
-## find the smallest (in absolute value) k eigenvalues of A5
+## Find the smallest (in absolute value) k eigenvalues of A5
 eigs_sym(A5, k, which = "SM")
 
-## another way to do this: use the sigma argument
+## Another way to do this: use the sigma argument
 eigs_sym(A5, k, sigma = 0)
 
 ## The results should be the same,

@@ -47,16 +47,16 @@
 ##' @param sigma Shift parameter. See section \strong{Shift-And-Invert Mode}.
 ##' @param opts Control parameters related to the computing
 ##'             algorithm. See \strong{Details} below.
-##' @param \dots Currently not used.
+##' @param \dots Arguments for specialized S3 function calls, for example
+##'              \code{lower}, \code{n} and \code{args}.
 ##' @param lower For symmetric matrices, should the lower triangle
 ##'              or upper triangle be used.
 ##' @param n Only used when \code{A} is a function, to specify the
 ##'          dimension of the implicit matrix. See section
 ##'          \strong{Function Interface} for details.
 ##' @param args Only used when \code{A} is a function. This argument
-##'             will be passed to the \code{A} function containing any
-##'             extra data. See section \strong{Function Interface}
-##'             for details.
+##'             will be passed to the \code{A} function when it is called.
+##'             See section \strong{Function Interface} for details.
 ##'
 ##' @details The \code{which} argument is a character string
 ##' that specifies the type of eigenvalues to be computed.
