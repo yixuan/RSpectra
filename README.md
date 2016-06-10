@@ -105,3 +105,16 @@ svds(Asp1, k)
 svds(Asp2, k, nu = 0, nv = 0)
 ```
 
+and function interface
+
+```r
+f = function(x, args)
+{
+    as.numeric(args %*% x)
+}
+g = function(x, args)
+{
+    as.numeric(crossprod(args, x))
+}
+svds(f, k, Atrans = g, dim = c(m, n), args = Asp1)
+```
