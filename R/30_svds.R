@@ -124,3 +124,10 @@ svds.dgRMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 svds.dsyMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
     svds.real_sym(A, k, nu, nv, opts, ..., mattype = "dsyMatrix",
                   extra_args = list(use_lower = (A@uplo == "L")))
+
+##' @rdname svds
+##' @export
+svds.function <- function(A, k, nu = k, nv = k, opts = list(), ...,
+                          Atrans, m, n, args = NULL)
+    svds.real_gen(A, k, nu, nv, opts, ..., mattype = "function",
+                  extra_args = list(Atrans = Atrans, m = m, n = n, fun_args = args))

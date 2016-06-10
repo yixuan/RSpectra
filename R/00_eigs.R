@@ -271,8 +271,8 @@ eigs.function <- function(A, k, which = "LM", sigma = NULL,
                           opts = list(), ...,
                           n = NULL, args = NULL)
     eigs.real_gen(A, as.integer(n), k, which, sigma, opts, ..., mattype = "function",
-                  extra_args = list(fun_args = args))
-
+                  extra_args = list(Atrans = function() NULL, fun_args = args))
+## Atrans is just a fake function here since it is only used in svds()
 
 
 ##' @rdname eigs
@@ -317,7 +317,8 @@ eigs_sym.function <- function(A, k, which = "LM", sigma = NULL, opts = list(),
                               lower = TRUE, ..., n = NULL, args = NULL)
 {
     eigs.real_sym(A, as.integer(n), k, which, sigma, opts, ..., mattype = "function",
-                  extra_args = list(fun_args = args))
+                  extra_args = list(Atrans = function() NULL, fun_args = args))
+    ## Atrans is just a fake function here since it is only used in svds()
 }
 
 
