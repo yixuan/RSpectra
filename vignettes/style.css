@@ -1,0 +1,9 @@
+body {
+    font-size: 16px;
+}
+
+pre {
+    background-color: #f5f5f5;
+    border: 1px solid #eeeeee;
+    border-radius: 0;
+}
