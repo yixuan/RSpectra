@@ -1,0 +1,206 @@
+---
+title: "Large Scale Eigenvalue Decomposition and SVD with RSpectra"
+author: "Yixuan Qiu"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_document:
+    theme: flatly
+    highlight: haddock
+    css: style.css
+vignette: >
+  %\VignetteIndexEntry{Large Scale Eigenvalue Decomposition and SVD with RSpectra}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Introduction
+
+Eigenvalue decomposition is a commonly used technique in
+numerous statistical problems. For example, principal component analysis (PCA)
+basically conducts eigenvalue decomposition on the sample covariance of a data
+matrix: the eigenvalues are the component variances, and eigenvectors are the
+variable loadings.
+
+In R, the standard way to compute eigenvalues is the `eigen()` function.
+However, when the matrix becomes large, `eigen()` can be very time-consuming:
+the complexity to calculate all eigenvalues of a $n \times n$ matrix is
+$O(n^3)$.
+
+While in real applications, we usually only need to compute a few
+eigenvalues or eigenvectors, for example to visualize high dimensional
+data using PCA, we may only use the first two or three components to draw
+a scatterplot. Unfortunately in `eigen()`, there is no option to limit the
+number of eigenvalues to be computed. This means that we always need to do the
+full eigen decomposition, which can cause a huge waste in computation.
+
+The same thing happens in Singular Value Decomposition (SVD). It is often the
+case that only a Partial SVD or Truncated SVD is needed, and moreover the
+matrix is usually stored in sparse format. Base R does not provide functions
+suitable for these special needs.
+
+And this is why the **RSpectra** package was developed. **RSpectra** provides
+an R interface to the
+[Spectra](http://yixuan.cos.name/spectra/) library, which is used to solve
+large scale eigenvalue problems. The core part of **Spectra** and **RSpectra**
+was written in efficient C++ code, and they can handle large scale matrices
+in either dense or sparse formats.
+
+
+
+## Eigenvalue Problem
+
+### Basic Usage
+
+The **RSpectra** package provides functions `eigs()` and `eigs_sym()` to
+calculate eigenvalues of general and symmetric matrices respectively.
+If the matrix is known to be symmetric, calling
+`eigs_sym()` is preferred since it guarantees that the eigenvalues are real.
+
+To obtain eigenvalues of a square matrix `A`, simply call the corresponding
+function, tell it how many eigenvalues are requested (argument `k`),
+and which ones are going to be selected (argument `which`).
+By default, `which = "LM"` means to pick the eigenvalues
+with the largest magnitude (modulus for complex numbers and absolute value
+for real numbers). 
+
+We first generate some random matrix and show some of the eigenvalues and
+eigenvectors:
+
+```{r}
+library(RSpectra)
+n = 100  # matrix size
+k = 5    # number of eigenvalues to calculate
+set.seed(123)
+## Some random data
+M = matrix(rnorm(n^2), n)
+## Make it symmetric
+A = crossprod(M)
+## Show its largest 10 eigenvalues and associated eigenvectors
+head(eigen(A)$values, 5)
+head(eigen(A)$vectors[, 1:5])
+```
+
+Now we use **RSpectra** to directly obtain the largest 5 eigenvalues:
+
+```{r}
+## Use RSpectra to find the largest 5 eigenvalues
+res = eigs_sym(A, k, which = "LM")  # "LM" is the default
+res$values
+head(res$vectors)
+```
+
+If only eigenvalues are requested, the `retvec` option can be used:
+
+```{r}
+eigs_sym(A, k, opts = list(retvec = FALSE))
+```
+
+### Matrix in Sparse Format
+
+For really large data, the matrix is usually stored in sparse format.
+**RSpectra** supports the `dgCMatrix` and `dgRMatrix` matrix types defined
+in the **Matrix** package.
+
+```{r}
+library(Matrix)
+Msp = as(M, "dgCMatrix")
+Asp = as(A, "dgRMatrix")
+
+eigs(Msp, k, which = "LR", opts = list(retvec = FALSE))$values  # largest real part
+eigs_sym(Asp, k, opts = list(retvec = FALSE))$values
+```
+
+An even more general way to specify the matrix `A` is to define a function that
+calculates `A %*% x` for any vector `x`. This representation is called the
+**Function Interface**, which can also be regarded as a sparse format, since
+users do not need to store the matrix `A`, but only the operator `x -> Ax`.
+For example, to represent a diagonal matrix $diag(1, 2, \ldots, 10)$ and
+calculate its eigenvalues, we can define the function `f` and call the
+`eigs_sym()` function:
+
+```{r}
+## Implicitly define the matrix by a function that calculates A %*% x
+## Below represents a diagonal matrix whose elements are stored in the `args` parameter
+f = function(x, args)
+{
+    ## diag(args) %*% x == x * args
+    return(x * args)
+}
+eigs_sym(f, k = 3, n = 10, args = 1:10)
+```
+
+`n` gives the dimension of the matrix, and `args` contains user data that will
+be passed to `f`.
+
+### Smallest Eigenvalues
+
+Sometimes you may need to calculate the smallest (in magnitude) `k` eigenvalues
+of a matrix. A direct way to do so is to use `eigs(..., which = "SM")`.
+However, the algorithm of **RSpectra** is good at finding large
+eigenvalues instead of small ones, so `which = "SM"` may involve much
+computation or even not converging.
+
+The recommended way to retrieve the smallest eigenvalues is to utilize
+the spectral transformation: If $A$ has eigenvalues $\lambda_i$,
+then $(A-\sigma I)^{-1}$ has eigenvalues $1/(\lambda_i-\sigma)$. Therefore,
+we can set $\sigma = 0$ and calculate the largest eigenvalues of $A^{-1}$,
+whose reciprocals are exactly the smallest eigenvalues of $A$.
+
+`eigs()` implements the spectral transformation via the parameter `sigma`, so
+the following code returns the smallest eigenvalues of `A`. Note that
+`eigs()` always returns eigenvalues in the original scale (i.e., $\lambda_i$
+instead of $1/(\lambda_i-\sigma)$).
+
+```{r}
+eigs_sym(A, k, which = "LM", sigma = 0)$values  # recommended way
+eigs_sym(A, k, which = "SM")$values             # not recommended
+```
+
+More generally, the option `which = "LM", sigma = s` selects eigenvalues
+that are closest to `s`.
+
+
+
+## Truncated SVD
+
+Truncated SVD (or Partial SVD) is frequently used in text mining and image
+compression, which computes the leading singular values and singular vectors
+or a rectangular matrix.
+
+**RSpectra** has the `svds()` function to compute Truncated SVD:
+
+```{r}
+m = 100
+n = 20
+k = 5
+set.seed(123)
+A = matrix(rnorm(m * n), m)
+
+str(svds(A, k, nu = k, nv = k))
+```
+
+Similar to `eigs()`, `svds()` supports sparse matrices:
+
+```{r}
+Asp = as(A, "dgCMatrix")
+svds(Asp, k, nu = 0, nv = 0)
+```
+
+`svds()` also has the function interface: users provide functions `A`
+and `Atrans` that calcualtes $Ax$ and $A'x$ respectively, and `svds()` will
+compute the Partial SVD.
+
+```{r}
+Af      = function(x, args)  as.numeric(args %*% x)
+Atransf = function(x, args)  as.numeric(crossprod(args, x))
+str(svds(Af, k, Atrans = Atransf, dim = c(m, n), args = Asp))
+```
+
+
+## Performance
+
+**RSpectra** is written in efficient C++ code.
+[This page](http://yixuan.cos.name/spectra/performance.html) gives some
+benchmarking results of `svds()` with other similar functions available in R
+and extension packages.
+

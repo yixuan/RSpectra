@@ -30,5 +30,8 @@ Depends:
 Imports:
     Matrix (>= 1.1-0),
     Rcpp (>= 0.11.5)
+Suggests:
+    knitr
 LinkingTo: Rcpp, RcppEigen (>= 0.3.2.2.0)
+VignetteBuilder: knitr
 RoxygenNote: 5.0.1
