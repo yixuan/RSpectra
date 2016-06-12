@@ -8,6 +8,7 @@
             specified by two functions, \code{A} and \code{Atrans}, which
             calculate the matrix multiplication and transpose multiplication
             respectively.
+      \item Added a package vignette.
     }
   }
 }
