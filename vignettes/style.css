@@ -4,6 +4,11 @@ body {
 
 pre {
     background-color: #f5f5f5;
+    color: #333333;
     border: 1px solid #eeeeee;
     border-radius: 0;
+}
+
+.title, .author, .date {
+    text-align: center;
 }

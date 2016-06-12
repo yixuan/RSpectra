@@ -1,5 +1,5 @@
 ---
-title: "Large Scale Eigenvalue Decomposition and SVD with RSpectra"
+title: "Large Scale Eigenvalue Decomposition and SVD"
 author: "Yixuan Qiu"
 date: "`r Sys.Date()`"
 output:
@@ -53,29 +53,28 @@ in either dense or sparse formats.
 
 The **RSpectra** package provides functions `eigs()` and `eigs_sym()` to
 calculate eigenvalues of general and symmetric matrices respectively.
-If the matrix is known to be symmetric, calling
+If the matrix is known to be symmetric,
 `eigs_sym()` is preferred since it guarantees that the eigenvalues are real.
 
-To obtain eigenvalues of a square matrix `A`, simply call the corresponding
-function, tell it how many eigenvalues are requested (argument `k`),
+To obtain eigenvalues of a square matrix `A`, simply call the `eigs()` or
+`eigs_sym()` function, tell it how many eigenvalues are requested (argument `k`),
 and which ones are going to be selected (argument `which`).
 By default, `which = "LM"` means to pick the eigenvalues
 with the largest magnitude (modulus for complex numbers and absolute value
 for real numbers). 
 
-We first generate some random matrix and show some of the eigenvalues and
-eigenvectors:
+Below we first generate some random matrices and display some of the eigenvalues
+and eigenvectors:
 
 ```{r}
-library(RSpectra)
+set.seed(123)
 n = 100  # matrix size
 k = 5    # number of eigenvalues to calculate
-set.seed(123)
-## Some random data
+# Some random data
 M = matrix(rnorm(n^2), n)
-## Make it symmetric
+# Make it symmetric
 A = crossprod(M)
-## Show its largest 10 eigenvalues and associated eigenvectors
+# Show its largest 5 eigenvalues and associated eigenvectors
 head(eigen(A)$values, 5)
 head(eigen(A)$vectors[, 1:5])
 ```
@@ -83,7 +82,7 @@ head(eigen(A)$vectors[, 1:5])
 Now we use **RSpectra** to directly obtain the largest 5 eigenvalues:
 
 ```{r}
-## Use RSpectra to find the largest 5 eigenvalues
+library(RSpectra)
 res = eigs_sym(A, k, which = "LM")  # "LM" is the default
 res$values
 head(res$vectors)
@@ -119,11 +118,11 @@ calculate its eigenvalues, we can define the function `f` and call the
 `eigs_sym()` function:
 
 ```{r}
-## Implicitly define the matrix by a function that calculates A %*% x
-## Below represents a diagonal matrix whose elements are stored in the `args` parameter
+# Implicitly define the matrix by a function that calculates A %*% x
+# Below represents a diagonal matrix whose elements are stored in the `args` parameter
 f = function(x, args)
 {
-    ## diag(args) %*% x == x * args
+    # diag(args) %*% x == x * args
     return(x * args)
 }
 eigs_sym(f, k = 3, n = 10, args = 1:10)
@@ -137,8 +136,8 @@ be passed to `f`.
 Sometimes you may need to calculate the smallest (in magnitude) `k` eigenvalues
 of a matrix. A direct way to do so is to use `eigs(..., which = "SM")`.
 However, the algorithm of **RSpectra** is good at finding large
-eigenvalues instead of small ones, so `which = "SM"` may involve much
-computation or even not converging.
+eigenvalues rather than small ones, so `which = "SM"` tends to require much
+more iterations or even may not converge.
 
 The recommended way to retrieve the smallest eigenvalues is to utilize
 the spectral transformation: If $A$ has eigenvalues $\lambda_i$,
@@ -165,15 +164,15 @@ that are closest to `s`.
 
 Truncated SVD (or Partial SVD) is frequently used in text mining and image
 compression, which computes the leading singular values and singular vectors
-or a rectangular matrix.
+of a rectangular matrix.
 
 **RSpectra** has the `svds()` function to compute Truncated SVD:
 
 ```{r}
+set.seed(123)
 m = 100
 n = 20
 k = 5
-set.seed(123)
 A = matrix(rnorm(m * n), m)
 
 str(svds(A, k, nu = k, nv = k))
@@ -188,7 +187,7 @@ svds(Asp, k, nu = 0, nv = 0)
 
 `svds()` also has the function interface: users provide functions `A`
 and `Atrans` that calcualtes $Ax$ and $A'x$ respectively, and `svds()` will
-compute the Partial SVD.
+compute the Truncated SVD.
 
 ```{r}
 Af      = function(x, args)  as.numeric(args %*% x)
