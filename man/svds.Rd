@@ -12,18 +12,18 @@
 \usage{
 svds(A, k, nu = k, nv = k, opts = list(), ...)
 
-\method{svds}{matrix}(A, k, nu = k, nv = k, opts = list())
+\method{svds}{matrix}(A, k, nu = k, nv = k, opts = list(), ...)
 
-\method{svds}{dgeMatrix}(A, k, nu = k, nv = k, opts = list())
+\method{svds}{dgeMatrix}(A, k, nu = k, nv = k, opts = list(), ...)
 
-\method{svds}{dgCMatrix}(A, k, nu = k, nv = k, opts = list())
+\method{svds}{dgCMatrix}(A, k, nu = k, nv = k, opts = list(), ...)
 
-\method{svds}{dgRMatrix}(A, k, nu = k, nv = k, opts = list())
+\method{svds}{dgRMatrix}(A, k, nu = k, nv = k, opts = list(), ...)
 
-\method{svds}{dsyMatrix}(A, k, nu = k, nv = k, opts = list())
+\method{svds}{dsyMatrix}(A, k, nu = k, nv = k, opts = list(), ...)
 
-\method{svds}{function}(A, k, nu = k, nv = k, opts = list(), Atrans, dim,
-  args = NULL)
+\method{svds}{function}(A, k, nu = k, nv = k, opts = list(), ..., Atrans,
+  dim, args = NULL)
 }
 \arguments{
 \item{A}{The matrix whose truncated SVD is to be computed.}

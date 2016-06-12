@@ -198,7 +198,7 @@ eigs <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 
 ##' @rdname eigs
 ##' @export
-eigs.matrix <- function(A, k, which = "LM", sigma = NULL, opts = list())
+eigs.matrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 {
     if(isSymmetric(A) &
            which %in% c("LM", "SM", "LR", "SR") &
@@ -215,7 +215,7 @@ eigs.matrix <- function(A, k, which = "LM", sigma = NULL, opts = list())
 
 ##' @rdname eigs
 ##' @export
-eigs.dgeMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list())
+eigs.dgeMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 {
     if(isSymmetric(A) &
            which %in% c("LM", "SM", "LR", "SR") &
@@ -232,7 +232,7 @@ eigs.dgeMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list())
 
 ##' @rdname eigs
 ##' @export
-eigs.dgCMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list())
+eigs.dgCMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 {
     if(isSymmetric(A) &
            which %in% c("LM", "SM", "LR", "SR") &
@@ -250,18 +250,18 @@ eigs.dgCMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list())
 ##' @rdname eigs
 ##' @export
 ## isSymmetric() does not support dgRMatrix
-eigs.dgRMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list())
+eigs.dgRMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
     eigs_real_gen(A, nrow(A), k, which, sigma, opts, mattype = "dgRMatrix")
 
 ##' @rdname eigs
 ##' @export
-eigs.dsyMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list())
+eigs.dsyMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
     eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "dsyMatrix",
                   extra_args = list(use_lower = (A@uplo == "L")))
 
 ##' @rdname eigs
 ##' @export
-eigs.function <- function(A, k, which = "LM", sigma = NULL, opts = list(),
+eigs.function <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...,
                           n = NULL, args = NULL)
     eigs_real_gen(A, as.integer(n), k, which, sigma, opts, mattype = "function",
                   extra_args = list(Atrans = function() NULL, fun_args = args))
@@ -277,28 +277,28 @@ eigs_sym <- function(A, k, which = "LM", sigma = NULL, opts = list(),
     UseMethod("eigs_sym")
 
 eigs_sym.matrix <- function(A, k, which = "LM", sigma = NULL, opts = list(),
-                            lower = TRUE)
+                            lower = TRUE, ...)
 {
     eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_matrix",
                   extra_args = list(use_lower = as.logical(lower)))
 }
 
 eigs_sym.dgeMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(),
-                               lower = TRUE)
+                               lower = TRUE, ...)
 {
     eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_dgeMatrix",
                   extra_args = list(use_lower = as.logical(lower)))
 }
 
 eigs_sym.dgCMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(),
-                               lower = TRUE)
+                               lower = TRUE, ...)
 {
     eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_dgCMatrix",
                   extra_args = list(use_lower = as.logical(lower)))
 }
 
 eigs_sym.dgRMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(),
-                               lower = TRUE)
+                               lower = TRUE, ...)
 {
     eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_dgRMatrix",
                   extra_args = list(use_lower = as.logical(lower)))
@@ -307,7 +307,7 @@ eigs_sym.dgRMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(),
 ##' @rdname eigs
 ##' @export
 eigs_sym.function <- function(A, k, which = "LM", sigma = NULL, opts = list(),
-                              lower = TRUE, n = NULL, args = NULL)
+                              lower = TRUE, ..., n = NULL, args = NULL)
 {
     eigs_real_sym(A, as.integer(n), k, which, sigma, opts, mattype = "function",
                   extra_args = list(Atrans = function() NULL, fun_args = args))

@@ -140,7 +140,7 @@ svds <- function(A, k, nu = k, nv = k, opts = list(), ...)
 
 ##' @rdname svds
 ##' @export
-svds.matrix <- function(A, k, nu = k, nv = k, opts = list())
+svds.matrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 {
     fun = if(isSymmetric(A)) svds_real_sym else svds_real_gen
     fun(A, k, nu, nv, opts, mattype = "matrix")
@@ -148,7 +148,7 @@ svds.matrix <- function(A, k, nu = k, nv = k, opts = list())
 
 ##' @rdname svds
 ##' @export
-svds.dgeMatrix <- function(A, k, nu = k, nv = k, opts = list())
+svds.dgeMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 {
     fun = if(isSymmetric(A)) svds_real_sym else svds_real_gen
     fun(A, k, nu, nv, opts, mattype = "dgeMatrix")
@@ -156,7 +156,7 @@ svds.dgeMatrix <- function(A, k, nu = k, nv = k, opts = list())
 
 ##' @rdname svds
 ##' @export
-svds.dgCMatrix <- function(A, k, nu = k, nv = k, opts = list())
+svds.dgCMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 {
     fun = if(isSymmetric(A)) svds_real_sym else svds_real_gen
     fun(A, k, nu, nv, opts, mattype = "dgCMatrix")
@@ -164,18 +164,18 @@ svds.dgCMatrix <- function(A, k, nu = k, nv = k, opts = list())
 
 ##' @rdname svds
 ##' @export
-svds.dgRMatrix <- function(A, k, nu = k, nv = k, opts = list())
+svds.dgRMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
     svds_real_gen(A, k, nu, nv, opts, mattype = "dgRMatrix")
 
 ##' @rdname svds
 ##' @export
-svds.dsyMatrix <- function(A, k, nu = k, nv = k, opts = list())
+svds.dsyMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
     svds_real_sym(A, k, nu, nv, opts, mattype = "dsyMatrix",
                   extra_args = list(use_lower = (A@uplo == "L")))
 
 ##' @rdname svds
 ##' @export
-svds.function <- function(A, k, nu = k, nv = k, opts = list(),
+svds.function <- function(A, k, nu = k, nv = k, opts = list(), ...,
                           Atrans, dim, args = NULL)
     svds_real_gen(A, k, nu, nv, opts, mattype = "function",
                   extra_args = list(Atrans   = Atrans,
