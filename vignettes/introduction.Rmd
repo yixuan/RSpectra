@@ -1,12 +1,11 @@
 ---
-title: "Large Scale Eigenvalue Decomposition and SVD"
+title: "Large Scale Eigenvalue Decomposition and SVD with RSpectra"
 author: "Yixuan Qiu"
 date: "`r Sys.Date()`"
 output:
-  rmarkdown::html_document:
-    theme: flatly
-    highlight: haddock
-    css: style.css
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
 vignette: >
   %\VignetteIndexEntry{Large Scale Eigenvalue Decomposition and SVD with RSpectra}
   %\VignetteEngine{knitr::rmarkdown}

@@ -1,6 +1,14 @@
 \name{NEWS}
 \title{News for Package "RSpectra"}
 
+\section{Changes in RSpectra version 0.12-x}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item Using \pkg{prettydoc} to format vignette.
+    }
+  }
+}
+
 \section{Changes in RSpectra version 0.12-0}{
   \subsection{NEW FEATURES}{
     \itemize{
