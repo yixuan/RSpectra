@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Yixuan Qiu <yixuan.qiu@cos.name>
+// Copyright (C) 2016-2017 Yixuan Qiu <yixuan.qiu@cos.name>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
@@ -8,6 +8,8 @@
 #define SIMPLE_RANDOM_H
 
 #include <Eigen/Core>
+
+/// \cond
 
 namespace Spectra {
 
@@ -62,6 +64,12 @@ public:
         m_rand(init_seed ? (init_seed & m_max) : 1)
     {}
 
+    Scalar random()
+    {
+        m_rand = next_long_rand(m_rand);
+        return Scalar(m_rand) / Scalar(m_max) - Scalar(0.5);
+    }
+
     // Vector of random numbers of type Scalar
     // Ranging from -0.5 to 0.5
     Vector random_vec(const int len)
@@ -78,5 +86,7 @@ public:
 
 
 } // namespace Spectra
+
+/// \endcond
 
 #endif // SIMPLE_RANDOM_H

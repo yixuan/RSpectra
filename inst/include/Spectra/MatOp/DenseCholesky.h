@@ -4,8 +4,8 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#ifndef DENSE_SYM_SHIFT_SOLVE_H
-#define DENSE_SYM_SHIFT_SOLVE_H
+#ifndef DENSE_CHOLESKY_H
+#define DENSE_CHOLESKY_H
 
 #include <Eigen/Core>
 #include <Eigen/Cholesky>
@@ -17,12 +17,13 @@ namespace Spectra {
 ///
 /// \ingroup MatOp
 ///
-/// This class defines the shift-solve operation on a real symmetric matrix \f$A\f$,
-/// i.e., calculating \f$y=(A-\sigma I)^{-1}x\f$ for any real \f$\sigma\f$ and
-/// vector \f$x\f$. It is mainly used in the SymEigsShiftSolver eigen solver.
+/// This class defines the operations related to Cholesky decomposition on a
+/// positive definite matrix, \f$B=LL'\f$, where \f$L\f$ is a lower triangular
+/// matrix. It is mainly used in the SymGEigsSolver generalized eigen solver
+/// in the Cholesky decomposition mode.
 ///
 template <typename Scalar, int Uplo = Eigen::Lower>
-class DenseSymShiftSolve
+class DenseCholesky
 {
 private:
     typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> Matrix;
@@ -33,9 +34,8 @@ private:
 
     typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
 
-    const MapConstMat m_mat;
     const int m_n;
-    Eigen::LDLT<Matrix, Uplo> m_solver;
+    Eigen::LLT<Matrix, Uplo> m_decomp;
 
 public:
     ///
@@ -46,12 +46,13 @@ public:
     /// `Eigen::MatrixXf`), or its mapped version
     /// (e.g. `Eigen::Map<Eigen::MatrixXd>`).
     ///
-    DenseSymShiftSolve(ConstGenericMatrix& mat_) :
-        m_mat(mat_.data(), mat_.rows(), mat_.cols()),
+    DenseCholesky(ConstGenericMatrix& mat_) :
         m_n(mat_.rows())
     {
         if(mat_.rows() != mat_.cols())
-            throw std::invalid_argument("DenseSymShiftSolve: matrix must be square");
+            throw std::invalid_argument("DenseCholesky: matrix must be square");
+
+        m_decomp.compute(mat_);
     }
 
     ///
@@ -64,29 +65,35 @@ public:
     int cols() const { return m_n; }
 
     ///
-    /// Set the real shift \f$\sigma\f$.
-    ///
-    void set_shift(Scalar sigma)
-    {
-        m_solver.compute(m_mat - sigma * Matrix::Identity(m_n, m_n));
-    }
-
-    ///
-    /// Perform the shift-solve operation \f$y=(A-\sigma I)^{-1}x\f$.
+    /// Perform the lower triangular solving operation \f$y=L^{-1}x\f$.
     ///
     /// \param x_in  Pointer to the \f$x\f$ vector.
     /// \param y_out Pointer to the \f$y\f$ vector.
     ///
-    // y_out = inv(A - sigma * I) * x_in
-    void perform_op(const Scalar* x_in, Scalar* y_out) const
+    // y_out = inv(L) * x_in
+    void lower_triangular_solve(const Scalar* x_in, Scalar* y_out) const
     {
         MapConstVec x(x_in,  m_n);
         MapVec      y(y_out, m_n);
-        y.noalias() = m_solver.solve(x);
+        y.noalias() = m_decomp.matrixL().solve(x);
+    }
+
+    ///
+    /// Perform the upper triangular solving operation \f$y=(L')^{-1}x\f$.
+    ///
+    /// \param x_in  Pointer to the \f$x\f$ vector.
+    /// \param y_out Pointer to the \f$y\f$ vector.
+    ///
+    // y_out = inv(L') * x_in
+    void upper_triangular_solve(const Scalar* x_in, Scalar* y_out) const
+    {
+        MapConstVec x(x_in,  m_n);
+        MapVec      y(y_out, m_n);
+        y.noalias() = m_decomp.matrixU().solve(x);
     }
 };
 
 
 } // namespace Spectra
 
-#endif // DENSE_SYM_SHIFT_SOLVE_H
+#endif // DENSE_CHOLESKY_H

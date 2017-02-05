@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Yixuan Qiu <yixuan.qiu@cos.name>
+// Copyright (C) 2016-2017 Yixuan Qiu <yixuan.qiu@cos.name>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
@@ -10,7 +10,6 @@
 #include <Eigen/Core>
 #include <cmath>      // std::sqrt
 #include <algorithm>  // std::fill, std::copy
-#include <limits>     // std::numeric_limits
 #include <stdexcept>  // std::logic_error
 
 namespace Spectra {
@@ -72,7 +71,7 @@ public:
     /// Only the upper triangular and the lower subdiagonal parts of
     /// the matrix are used.
     ///
-    UpperHessenbergQR(ConstGenericMatrix &mat) :
+    UpperHessenbergQR(ConstGenericMatrix& mat) :
         m_n(mat.rows()),
         m_mat_T(m_n, m_n),
         m_rot_cos(m_n - 1),
@@ -91,7 +90,7 @@ public:
     /// Only the upper triangular and the lower subdiagonal parts of
     /// the matrix are used.
     ///
-    virtual void compute(ConstGenericMatrix &mat)
+    virtual void compute(ConstGenericMatrix& mat)
     {
         m_n = mat.rows();
         m_mat_T.resize(m_n, m_n);
@@ -100,7 +99,7 @@ public:
 
         std::copy(mat.data(), mat.data() + mat.size(), m_mat_T.data());
 
-        Scalar xi, xj, r, c, s, eps = std::numeric_limits<Scalar>::epsilon();
+        Scalar xi, xj, r, c, s, eps = Eigen::NumTraits<Scalar>::epsilon();
         Scalar *Tii, *ptr;
         for(Index i = 0; i < m_n - 1; i++)
         {
@@ -112,7 +111,7 @@ public:
 
             xi = Tii[0];  // mat_T(i, i)
             xj = Tii[1];  // mat_T(i + 1, i)
-            r = std::sqrt(xi * xi + xj * xj);
+            r = Eigen::numext::hypot(xi, xj);
             if(r <= eps)
             {
                 r = 0;
@@ -217,7 +216,7 @@ public:
     /// the template parameter `Scalar` defined.
     ///
     // Y -> QY = G1 * G2 * ... * Y
-    void apply_QY(Vector &Y)
+    void apply_QY(Vector& Y)
     {
         if(!m_computed)
             throw std::logic_error("UpperHessenbergQR: need to call compute() first");
@@ -243,7 +242,7 @@ public:
     /// the template parameter `Scalar` defined.
     ///
     // Y -> Q'Y = G_{n-1}' * ... * G2' * G1' * Y
-    void apply_QtY(Vector &Y)
+    void apply_QtY(Vector& Y)
     {
         if(!m_computed)
             throw std::logic_error("UpperHessenbergQR: need to call compute() first");
@@ -439,7 +438,7 @@ public:
     /// Only the major- and sub- diagonal parts of
     /// the matrix are used.
     ///
-    TridiagQR(ConstGenericMatrix &mat) :
+    TridiagQR(ConstGenericMatrix& mat) :
         UpperHessenbergQR<Scalar>()
     {
         this->compute(mat);
@@ -454,7 +453,7 @@ public:
     /// Only the major- and sub- diagonal parts of
     /// the matrix are used.
     ///
-    void compute(ConstGenericMatrix &mat)
+    void compute(ConstGenericMatrix& mat)
     {
         this->m_n = mat.rows();
         this->m_mat_T.resize(this->m_n, this->m_n);
@@ -472,12 +471,12 @@ public:
                *c = this->m_rot_cos.data(),  // pointer to the cosine vector
                *s = this->m_rot_sin.data(),  // pointer to the sine vector
                r, tmp,
-               eps = std::numeric_limits<Scalar>::epsilon();
+               eps = Eigen::NumTraits<Scalar>::epsilon();
         for(Index i = 0; i < this->m_n - 2; i++)
         {
             // Tii[0] == T[i, i]
             // Tii[1] == T[i + 1, i]
-            r = std::sqrt(Tii[0] * Tii[0] + Tii[1] * Tii[1]);
+            r = Eigen::numext::hypot(Tii[0], Tii[1]);
             if(r <= eps)
             {
                 r = 0;
@@ -527,7 +526,7 @@ public:
             // this->m_mat_T(i + 1, i + 2) *= (*c);
         }
         // For i = n - 2
-        r = std::sqrt(Tii[0] * Tii[0] + Tii[1] * Tii[1]);
+        r = Eigen::numext::hypot(Tii[0], Tii[1]);
         if(r <= eps)
         {
             r = 0;

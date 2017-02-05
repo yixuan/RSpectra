@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Yixuan Qiu <yixuan.qiu@cos.name>
+// Copyright (C) 2016-2017 Yixuan Qiu <yixuan.qiu@cos.name>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
@@ -8,20 +8,17 @@
 #define SYM_EIGS_SOLVER_H
 
 #include <Eigen/Core>
-#include <Eigen/Eigenvalues>
 #include <vector>     // std::vector
 #include <cmath>      // std::abs, std::pow
 #include <algorithm>  // std::min, std::copy
-#include <limits>     // std::numeric_limits
 #include <stdexcept>  // std::invalid_argument
 
-#include "SelectionRule.h"
-#include "CompInfo.h"
-#include "SimpleRandom.h"
+#include "Util/SelectionRule.h"
+#include "Util/CompInfo.h"
+#include "Util/SimpleRandom.h"
 #include "LinAlg/UpperHessenbergQR.h"
 #include "LinAlg/TridiagEigen.h"
 #include "MatOp/DenseSymMatProd.h"
-#include "MatOp/DenseSymShiftSolve.h"
 
 
 namespace Spectra {
@@ -36,16 +33,16 @@ namespace Spectra {
 ///
 /// \ingroup EigenSolver
 ///
-/// This class implements the eigen solver for real symmetric matrices.
+/// This class implements the eigen solver for real symmetric matrices, i.e.,
+/// to solve \f$Ax=\lambda x\f$ where \f$A\f$ is symmetric.
 ///
 /// **Spectra** is designed to calculate a specified number (\f$k\f$)
 /// of eigenvalues of a large square matrix (\f$A\f$). Usually \f$k\f$ is much
 /// less than the size of the matrix (\f$n\f$), so that only a few eigenvalues
 /// and eigenvectors are computed.
 ///
-/// This class implements the eigen solver of a real symmetric matrix, but
-/// rather than providing the whole matrix, the algorithm only requires the
-/// matrix-vector multiplication operation of \f$A\f$. Therefore, users of
+/// Rather than providing the whole \f$A\f$ matrix, the algorithm only requires
+/// the matrix-vector multiplication operation of \f$A\f$. Therefore, users of
 /// this solver need to supply a class that computes the result of \f$Av\f$
 /// for any given vector \f$v\f$. The name of this class should be given to
 /// the template parameter `OpType`, and instance of this class passed to
@@ -55,7 +52,8 @@ namespace Spectra {
 /// for example `Eigen::MatrixXd`, then there is an easy way to construct such
 /// matrix operation class, by using the built-in wrapper class DenseSymMatProd
 /// which wraps an existing matrix object in **Eigen**. This is also the
-/// default template parameter for SymEigsSolver.
+/// default template parameter for SymEigsSolver. For sparse matrices, the
+/// wrapper class SparseSymMatProd can be used similarly.
 ///
 /// If the users need to define their own matrix-vector multiplication operation
 /// class, it should implement all the public member functions as in DenseSymMatProd.
@@ -68,7 +66,8 @@ namespace Spectra {
 ///                       The full list of enumeration values can be found in
 ///                       \ref Enumerations.
 /// \tparam OpType        The name of the matrix operation class. Users could either
-///                       use the DenseSymMatProd wrapper class, or define their
+///                       use the wrapper classes such as DenseSymMatProd and
+///                       SparseSymMatProd, or define their
 ///                       own that impelemnts all the public member functions as in
 ///                       DenseSymMatProd.
 ///
@@ -124,7 +123,7 @@ namespace Spectra {
 ///     int rows() { return 10; }
 ///     int cols() { return 10; }
 ///     // y_out = M * x_in
-///     void perform_op(double* x_in, double* y_out)
+///     void perform_op(double *x_in, double *y_out)
 ///     {
 ///         for(int i = 0; i < rows(); i++)
 ///         {
@@ -162,50 +161,50 @@ private:
     typedef Eigen::Array<bool, Eigen::Dynamic, 1> BoolArray;
     typedef Eigen::Map<Matrix> MapMat;
     typedef Eigen::Map<Vector> MapVec;
-    typedef Eigen::SelfAdjointEigenSolver<Matrix> EigenSolver;
 
 protected:
-    OpType *m_op;          // object to conduct matrix operation,
-                           // e.g. matrix-vector product
+    OpType* m_op;            // object to conduct matrix operation,
+                             // e.g. matrix-vector product
 
 private:
-    const int m_n;         // dimension of matrix A
+    const int m_n;           // dimension of matrix A
 
 protected:
-    const int m_nev;       // number of eigenvalues requested
+    const int m_nev;         // number of eigenvalues requested
 
 private:
-    const int m_ncv;       // number of ritz values
-    int m_nmatop;          // number of matrix operations called
-    int m_niter;           // number of restarting iterations
+    const int m_ncv;         // number of ritz values
+    int m_nmatop;            // number of matrix operations called
+    int m_niter;             // number of restarting iterations
 
-    Matrix m_fac_V;        // V matrix in the Arnoldi factorization
-    Matrix m_fac_H;        // H matrix in the Arnoldi factorization
-    Vector m_fac_f;        // residual in the Arnoldi factorization
+    Matrix m_fac_V;          // V matrix in the Arnoldi factorization
+    Matrix m_fac_H;          // H matrix in the Arnoldi factorization
+    Vector m_fac_f;          // residual in the Arnoldi factorization
 
 protected:
-    Vector m_ritz_val;     // ritz values
+    Vector m_ritz_val;       // ritz values
 
 private:
-    Matrix m_ritz_vec;     // ritz vectors
-    Vector m_ritz_est;     // last row of m_ritz_vec
-    BoolArray m_ritz_conv; // indicator of the convergence of ritz values
-    int m_info;            // status of the computation
+    Matrix m_ritz_vec;       // ritz vectors
+    Vector m_ritz_est;       // last row of m_ritz_vec
+    BoolArray m_ritz_conv;   // indicator of the convergence of ritz values
+    int m_info;              // status of the computation
 
-    const Scalar m_prec;   // precision parameter used to test convergence
-                           // m_prec = epsilon^(2/3)
-                           // epsilon is the machine precision,
-                           // e.g. ~= 1e-16 for the "double" type
+    const Scalar m_eps;      // the machine precision,
+                             // e.g. ~= 1e-16 for the "double" type
+    const Scalar m_approx_0; // a number that is approximately zero
+                             // m_approx_0 = m_eps^(2/3)
+                             // used to test the orthogonality of vectors
 
     // Arnoldi factorization starting from step-k
-    void factorize_from(int from_k, int to_m, const Vector &fk)
+    void factorize_from(int from_k, int to_m, const Vector& fk)
     {
         if(to_m <= from_k) return;
 
-        m_fac_f = fk;
+        m_fac_f.noalias() = fk;
 
         Vector w(m_n);
-        Scalar beta = m_fac_f.norm(), Hii = 0.0;
+        Scalar beta = norm(m_fac_f), Hii = 0.0;
         // Keep the upperleft k x k submatrix of H and set other elements to 0
         m_fac_H.rightCols(m_ncv - from_k).setZero();
         m_fac_H.block(from_k, 0, m_ncv - from_k, from_k).setZero();
@@ -215,16 +214,16 @@ private:
             // If beta = 0, then the next V is not full rank
             // We need to generate a new residual vector that is orthogonal
             // to the current V, which we call a restart
-            if(beta < m_prec)
+            if(beta < m_eps)
             {
                 SimpleRandom<Scalar> rng(2 * i);
                 m_fac_f.noalias() = rng.random_vec(m_n);
                 // f <- f - V * V' * f, so that f is orthogonal to V
                 MapMat V(m_fac_V.data(), m_n, i); // The first i columns
-                Vector Vf = V.transpose() * m_fac_f;
+                Vector Vf = inner_product(V, m_fac_f);
                 m_fac_f.noalias() -= V * Vf;
                 // beta <- ||f||
-                beta = m_fac_f.norm();
+                beta = norm(m_fac_f);
 
                 restart = true;
             }
@@ -243,7 +242,7 @@ private:
             m_op->perform_op(v.data(), w.data());
             m_nmatop++;
 
-            Hii = v.dot(w);
+            Hii = inner_product(v, w);
             m_fac_H(i - 1, i) = m_fac_H(i, i - 1); // Due to symmetry
             m_fac_H(i, i) = Hii;
 
@@ -254,15 +253,15 @@ private:
             else
                 m_fac_f.noalias() = w - m_fac_H(i, i - 1) * m_fac_V.col(i - 1) - Hii * v;
 
-            beta = m_fac_f.norm();
+            beta = norm(m_fac_f);
 
             // f/||f|| is going to be the next column of V, so we need to test
             // whether V' * (f/||f||) ~= 0
             MapMat V(m_fac_V.data(), m_n, i + 1); // The first (i+1) columns
-            Vector Vf = V.transpose() * m_fac_f;
+            Vector Vf = inner_product(V, m_fac_f);
             // If not, iteratively correct the residual
             int count = 0;
-            while(count < 5 && Vf.cwiseAbs().maxCoeff() > m_prec * beta)
+            while(count < 5 && Vf.cwiseAbs().maxCoeff() > m_approx_0 * beta)
             {
                 // f <- f - V * Vf
                 m_fac_f.noalias() -= V * Vf;
@@ -271,9 +270,9 @@ private:
                 m_fac_H(i, i - 1) = m_fac_H(i - 1, i);
                 m_fac_H(i, i) += Vf[i];
                 // beta <- ||f||
-                beta = m_fac_f.norm();
+                beta = norm(m_fac_f);
 
-                Vf.noalias() = V.transpose() * m_fac_f;
+                Vf.noalias() = inner_product(V, m_fac_f);
                 count++;
             }
         }
@@ -325,9 +324,9 @@ private:
     // Calculate the number of converged Ritz values
     int num_converged(Scalar tol)
     {
-        // thresh = tol * max(m_prec, abs(theta)), theta for ritz value
-        Array thresh = tol * m_ritz_val.head(m_nev).array().abs().max(m_prec);
-        Array resid =  m_ritz_est.head(m_nev).array().abs() * m_fac_f.norm();
+        // thresh = tol * max(m_approx_0, abs(theta)), theta for ritz value
+        Array thresh = tol * m_ritz_val.head(m_nev).array().abs().max(m_approx_0);
+        Array resid =  m_ritz_est.head(m_nev).array().abs() * norm(m_fac_f);
         // Converged "wanted" ritz values
         m_ritz_conv = (resid < thresh);
 
@@ -337,10 +336,12 @@ private:
     // Return the adjusted nev for restarting
     int nev_adjusted(int nconv)
     {
+        using std::abs;
+
         int nev_new = m_nev;
 
         for(int i = m_nev; i < m_ncv; i++)
-            if(std::abs(m_ritz_est[i]) < m_prec)  nev_new++;
+            if(abs(m_ritz_est[i]) < m_eps)  nev_new++;
 
         // Adjust nev_new, according to dsaup2.f line 677~684 in ARPACK
         nev_new += std::min(nconv, (m_ncv - nev_new) / 2);
@@ -348,6 +349,9 @@ private:
             nev_new = m_ncv / 2;
         else if(nev_new == 1 && m_ncv > 2)
             nev_new = 2;
+
+        if(nev_new > m_ncv - 1)
+            nev_new = m_ncv - 1;
 
         return nev_new;
     }
@@ -397,6 +401,15 @@ private:
     }
 
 protected:
+    // In generalized eigenvalue problem Ax=lambda*Bx, define the inner product to be <x, y> = x'By
+    // For regular eigenvalue problems, it is the usual inner product <x, y> = x'y
+    virtual Scalar inner_product(const Vector& x, const Vector& y) { return x.dot(y); }
+    virtual Scalar inner_product(const MapVec& x, const Vector& y) { return x.dot(y); }
+    virtual Vector inner_product(const MapMat& x, const Vector& y) { return x.transpose() * y; }
+
+    // B-norm of a vector. For regular eigenvalue problems it is simply the L2 norm
+    virtual Scalar norm(const Vector& x) { return x.norm(); }
+
     // Sort the first nev Ritz pairs in the specified order
     // This is used to return the final results
     virtual void sort_ritzpair(int sort_rule)
@@ -453,9 +466,9 @@ public:
     ///
     /// \param op_  Pointer to the matrix operation object, which should implement
     ///             the matrix-vector multiplication operation of \f$A\f$:
-    ///             calculating \f$Ay\f$ for any vector \f$y\f$. Users could either
-    ///             create the object from the DenseSymMatProd wrapper class, or
-    ///             define their own that impelemnts all the public member functions
+    ///             calculating \f$Av\f$ for any vector \f$v\f$. Users could either
+    ///             create the object from the wrapper class such as DenseSymMatProd, or
+    ///             define their own that impelements all the public member functions
     ///             as in DenseSymMatProd.
     /// \param nev_ Number of eigenvalues requested. This should satisfy \f$1\le nev \le n-1\f$,
     ///             where \f$n\f$ is the size of matrix.
@@ -465,7 +478,7 @@ public:
     ///             in each iteration. This parameter must satisfy \f$nev < ncv \le n\f$,
     ///             and is advised to take \f$ncv \ge 2\cdot nev\f$.
     ///
-    SymEigsSolver(OpType *op_, int nev_, int ncv_) :
+    SymEigsSolver(OpType* op_, int nev_, int ncv_) :
         m_op(op_),
         m_n(m_op->rows()),
         m_nev(nev_),
@@ -473,7 +486,8 @@ public:
         m_nmatop(0),
         m_niter(0),
         m_info(NOT_COMPUTED),
-        m_prec(std::pow(std::numeric_limits<Scalar>::epsilon(), Scalar(2.0) / 3))
+        m_eps(Eigen::NumTraits<Scalar>::epsilon()),
+        m_approx_0(Eigen::numext::pow(m_eps, Scalar(2.0) / 3))
     {
         if(nev_ < 1 || nev_ > m_n - 1)
             throw std::invalid_argument("nev must satisfy 1 <= nev <= n - 1, n is the size of matrix");
@@ -491,7 +505,7 @@ public:
     /// to find eigenvalues. This function allows the user to provide the initial
     /// residual vector.
     ///
-    void init(const Scalar *init_resid)
+    void init(const Scalar* init_resid)
     {
         // Reset all matrices/vectors to zero
         m_fac_V.resize(m_n, m_ncv);
@@ -515,8 +529,8 @@ public:
 
         Vector v(m_n);
         std::copy(init_resid, init_resid + m_n, v.data());
-        Scalar vnorm = v.norm();
-        if(vnorm < m_prec)
+        Scalar vnorm = norm(v);
+        if(vnorm < m_eps)
             throw std::invalid_argument("initial residual vector cannot be zero");
         v /= vnorm;
 
@@ -524,8 +538,8 @@ public:
         m_op->perform_op(v.data(), w.data());
         m_nmatop++;
 
-        m_fac_H(0, 0) = v.dot(w);
-        m_fac_f = w - v * m_fac_H(0, 0);
+        m_fac_H(0, 0) = inner_product(v, w);
+        m_fac_f.noalias() = w - v * m_fac_H(0, 0);
         m_fac_V.col(0) = v;
     }
 
@@ -533,8 +547,8 @@ public:
     /// Providing a random initial residual vector.
     ///
     /// This overloaded function generates a random initial residual vector
-    /// for the algorithm. Elements in the vector follow independent Uniform(-0.5, 0.5)
-    /// distributions.
+    /// (with a fixed random seed) for the algorithm. Elements in the vector
+    /// follow independent Uniform(-0.5, 0.5) distribution.
     ///
     void init()
     {
@@ -670,189 +684,6 @@ public:
     Matrix eigenvectors()
     {
         return eigenvectors(m_nev);
-    }
-};
-
-
-
-
-
-///
-/// \ingroup EigenSolver
-///
-/// This class implements the eigen solver for real symmetric matrices using
-/// the **shift-and-invert mode**. The background information of the symmetric
-/// eigen solver is documented in the SymEigsSolver class. Here we focus on
-/// explaining the shift-and-invert mode.
-///
-/// The shift-and-invert mode is based on the following fact:
-/// If \f$\lambda\f$ and \f$x\f$ are a pair of eigenvalue and eigenvector of
-/// matrix \f$A\f$, such that \f$Ax=\lambda x\f$, then for any \f$\sigma\f$,
-/// we have
-/// \f[(A-\sigma I)^{-1}x=\nu x\f]
-/// where
-/// \f[\nu=\frac{1}{\lambda-\sigma}\f]
-/// which indicates that \f$(\nu, x)\f$ is an eigenpair of the matrix
-/// \f$(A-\sigma I)^{-1}\f$.
-///
-/// Therefore, if we pass the matrix operation \f$(A-\sigma I)^{-1}y\f$
-/// (rather than \f$Ay\f$) to the eigen solver, then we would get the desired
-/// values of \f$\nu\f$, and \f$\lambda\f$ can also be easily obtained by noting
-/// that \f$\lambda=\sigma+\nu^{-1}\f$.
-///
-/// The reason why we need this type of manipulation is that
-/// the algorithm of **Spectra** (and also **ARPACK**)
-/// is good at finding eigenvalues with large magnitude, but may fail in looking
-/// for eigenvalues that are close to zero. However, if we really need them, we
-/// can set \f$\sigma=0\f$, find the largest eigenvalues of \f$A^{-1}\f$, and then
-/// transform back to \f$\lambda\f$, since in this case largest values of \f$\nu\f$
-/// implies smallest values of \f$\lambda\f$.
-///
-/// To summarize, in the shift-and-invert mode, the selection rule will apply to
-/// \f$\nu=1/(\lambda-\sigma)\f$ rather than \f$\lambda\f$. So a selection rule
-/// of `LARGEST_MAGN` combined with shift \f$\sigma\f$ will find eigenvalues of
-/// \f$A\f$ that are closest to \f$\sigma\f$. But note that the eigenvalues()
-/// method will always return the eigenvalues in the original problem (i.e.,
-/// returning \f$\lambda\f$ rather than \f$\nu\f$), and eigenvectors are the
-/// same for both the original problem and the shifted-and-inverted problem.
-///
-/// \tparam Scalar        The element type of the matrix.
-///                       Currently supported types are `float`, `double` and `long double`.
-/// \tparam SelectionRule An enumeration value indicating the selection rule of
-///                       the shifted-and-inverted eigenvalues.
-///                       The full list of enumeration values can be found in
-///                       \ref Enumerations.
-/// \tparam OpType        The name of the matrix operation class. Users could either
-///                       use the DenseSymShiftSolve wrapper class, or define their
-///                       own that impelemnts all the public member functions as in
-///                       DenseSymShiftSolve.
-///
-/// Below is an example that illustrates the use of the shift-and-invert mode:
-///
-/// \code{.cpp}
-/// #include <Eigen/Core>
-/// #include <SymEigsSolver.h>  // Also includes <MatOp/DenseSymShiftSolve.h>
-/// #include <iostream>
-///
-/// using namespace Spectra;
-///
-/// int main()
-/// {
-///     // A size-10 diagonal matrix with elements 1, 2, ..., 10
-///     Eigen::MatrixXd M = Eigen::MatrixXd::Zero(10, 10);
-///     for(int i = 0; i < M.rows(); i++)
-///         M(i, i) = i + 1;
-///
-///     // Construct matrix operation object using the wrapper class
-///     DenseSymShiftSolve<double> op(M);
-///
-///     // Construct eigen solver object with shift 0
-///     // This will find eigenvalues that are closest to 0
-///     SymEigsShiftSolver< double, LARGEST_MAGN,
-///                         DenseSymShiftSolve<double> > eigs(&op, 3, 6, 0.0);
-///
-///     eigs.init();
-///     eigs.compute();
-///     if(eigs.info() == SUCCESSFUL)
-///     {
-///         Eigen::VectorXd evalues = eigs.eigenvalues();
-///         // Will get (3.0, 2.0, 1.0)
-///         std::cout << "Eigenvalues found:\n" << evalues << std::endl;
-///     }
-///
-///     return 0;
-/// }
-/// \endcode
-///
-/// Also an example for user-supplied matrix shift-solve operation class:
-///
-/// \code{.cpp}
-/// #include <Eigen/Core>
-/// #include <SymEigsSolver.h>
-/// #include <iostream>
-///
-/// using namespace Spectra;
-///
-/// // M = diag(1, 2, ..., 10)
-/// class MyDiagonalTenShiftSolve
-/// {
-/// private:
-///     double sigma_;
-/// public:
-///     int rows() { return 10; }
-///     int cols() { return 10; }
-///     void set_shift(double sigma) { sigma_ = sigma; }
-///     // y_out = inv(A - sigma * I) * x_in
-///     // inv(A - sigma * I) = diag(1/(1-sigma), 1/(2-sigma), ...)
-///     void perform_op(double* x_in, double* y_out)
-///     {
-///         for(int i = 0; i < rows(); i++)
-///         {
-///             y_out[i] = x_in[i] / (i + 1 - sigma_);
-///         }
-///     }
-/// };
-///
-/// int main()
-/// {
-///     MyDiagonalTenShiftSolve op;
-///     // Find three eigenvalues that are closest to 3.14
-///     SymEigsShiftSolver<double, LARGEST_MAGN,
-///                        MyDiagonalTenShiftSolve> eigs(&op, 3, 6, 3.14);
-///     eigs.init();
-///     eigs.compute();
-///     if(eigs.info() == SUCCESSFUL)
-///     {
-///         Eigen::VectorXd evalues = eigs.eigenvalues();
-///         // Will get (4.0, 3.0, 2.0)
-///         std::cout << "Eigenvalues found:\n" << evalues << std::endl;
-///     }
-///
-///     return 0;
-/// }
-/// \endcode
-///
-template <typename Scalar = double,
-          int SelectionRule = LARGEST_MAGN,
-          typename OpType = DenseSymShiftSolve<double> >
-class SymEigsShiftSolver: public SymEigsSolver<Scalar, SelectionRule, OpType>
-{
-private:
-    typedef Eigen::Array<Scalar, Eigen::Dynamic, 1> Array;
-
-    Scalar sigma;
-
-    // First transform back the ritz values, and then sort
-    void sort_ritzpair(int sort_rule)
-    {
-        Array m_ritz_val_org = Scalar(1.0) / this->m_ritz_val.head(this->m_nev).array() + sigma;
-        this->m_ritz_val.head(this->m_nev) = m_ritz_val_org;
-        SymEigsSolver<Scalar, SelectionRule, OpType>::sort_ritzpair(sort_rule);
-    }
-public:
-    ///
-    /// Constructor to create a eigen solver object using the shift-and-invert mode.
-    ///
-    /// \param op_    Pointer to the matrix operation object, which should implement
-    ///               the shift-solve operation of \f$A\f$: calculating
-    ///               \f$(A-\sigma I)^{-1}y\f$ for any vector \f$y\f$. Users could either
-    ///               create the object from the DenseSymShiftSolve wrapper class, or
-    ///               define their own that impelemnts all the public member functions
-    ///               as in DenseSymShiftSolve.
-    /// \param nev_   Number of eigenvalues requested. This should satisfy \f$1\le nev \le n-1\f$,
-    ///               where \f$n\f$ is the size of matrix.
-    /// \param ncv_   Parameter that controls the convergence speed of the algorithm.
-    ///               Typically a larger `ncv_` means faster convergence, but it may
-    ///               also result in greater memory use and more matrix operations
-    ///               in each iteration. This parameter must satisfy \f$nev < ncv \le n\f$,
-    ///               and is advised to take \f$ncv \ge 2\cdot nev\f$.
-    /// \param sigma_ The value of the shift.
-    ///
-    SymEigsShiftSolver(OpType *op_, int nev_, int ncv_, Scalar sigma_) :
-        SymEigsSolver<Scalar, SelectionRule, OpType>(op_, nev_, ncv_),
-        sigma(sigma_)
-    {
-        this->m_op->set_shift(sigma);
     }
 };
 

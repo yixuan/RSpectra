@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Yixuan Qiu <yixuan.qiu@cos.name>
+// Copyright (C) 2016-2017 Yixuan Qiu <yixuan.qiu@cos.name>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
@@ -25,12 +25,13 @@ class DenseSymMatProd
 private:
     typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> Matrix;
     typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> Vector;
-    typedef Eigen::Map<const Matrix> MapMat;
-    typedef Eigen::Map< Eigen::Matrix<Scalar, Eigen::Dynamic, 1> > MapVec;
+    typedef Eigen::Map<const Matrix> MapConstMat;
+    typedef Eigen::Map<const Vector> MapConstVec;
+    typedef Eigen::Map<Vector> MapVec;
 
     typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
 
-    const MapMat m_mat;
+    const MapConstMat m_mat;
 
 public:
     ///
@@ -41,18 +42,18 @@ public:
     /// `Eigen::MatrixXf`), or its mapped version
     /// (e.g. `Eigen::Map<Eigen::MatrixXd>`).
     ///
-    DenseSymMatProd(ConstGenericMatrix &mat_) :
+    DenseSymMatProd(ConstGenericMatrix& mat_) :
         m_mat(mat_.data(), mat_.rows(), mat_.cols())
     {}
 
     ///
     /// Return the number of rows of the underlying matrix.
     ///
-    int rows() { return m_mat.rows(); }
+    int rows() const { return m_mat.rows(); }
     ///
     /// Return the number of columns of the underlying matrix.
     ///
-    int cols() { return m_mat.cols(); }
+    int cols() const { return m_mat.cols(); }
 
     ///
     /// Perform the matrix-vector multiplication operation \f$y=Ax\f$.
@@ -61,10 +62,10 @@ public:
     /// \param y_out Pointer to the \f$y\f$ vector.
     ///
     // y_out = A * x_in
-    void perform_op(Scalar *x_in, Scalar *y_out)
+    void perform_op(const Scalar* x_in, Scalar* y_out) const
     {
-        MapVec x(x_in, m_mat.cols());
-        MapVec y(y_out, m_mat.rows());
+        MapConstVec x(x_in,  m_mat.cols());
+        MapVec      y(y_out, m_mat.rows());
         y.noalias() = m_mat.template selfadjointView<Uplo>() * x;
     }
 };
