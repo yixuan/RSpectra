@@ -5,6 +5,7 @@
   \subsection{NEW FEATURES}{
     \itemize{
       \item Using \pkg{prettydoc} to format vignette.
+      \item Updated Spectra to v0.5.0.
     }
   }
 }
