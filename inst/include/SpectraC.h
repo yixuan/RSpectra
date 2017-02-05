@@ -17,7 +17,7 @@ typedef struct {
 } spectra_opts;
 
 /* Function to represent matrix operation */
-typedef void (*mat_op)(double* x_in, double* y_out, int n, void* data);
+typedef void (*mat_op)(const double* x_in, double* y_out, int n, void* data);
 
 /*
  * op:    Function pointer of matrix operation (in)

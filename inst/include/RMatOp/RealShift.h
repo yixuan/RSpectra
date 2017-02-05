@@ -10,7 +10,7 @@ public:
     virtual void set_shift(double sigma) = 0;
 
     // y_out = inv(A - sigma * I) * x_in
-    virtual void perform_op(double* x_in, double* y_out) = 0;
+    virtual void perform_op(const double* x_in, double* y_out) = 0;
 
     virtual ~RealShift() {}
 };

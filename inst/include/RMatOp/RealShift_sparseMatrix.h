@@ -9,6 +9,7 @@ class RealShift_sparseMatrix: public RealShift
 private:
     typedef Eigen::SparseMatrix<double, Storage> SpMat;
     typedef Eigen::MappedSparseMatrix<double, Storage> MapSpMat;
+    typedef Eigen::Map<const Eigen::VectorXd> MapConstVec;
     typedef Eigen::Map<Eigen::VectorXd> MapVec;
     typedef Eigen::SparseLU< Eigen::SparseMatrix<double, Eigen::ColMajor> > SpLUSolver;
 
@@ -36,9 +37,9 @@ public:
     }
 
     // y_out = inv(A - sigma * I) * x_in
-    void perform_op(double* x_in, double* y_out)
+    void perform_op(const double* x_in, double* y_out)
     {
-        MapVec x(x_in, n);
+        MapConstVec x(x_in, n);
         MapVec y(y_out, n);
         y.noalias() = solver.solve(x);
     }

@@ -26,7 +26,7 @@ public:
     int cols() const { return ncol; }
 
     // y_out = A * x_in
-    void perform_op(double* x_in, double* y_out)
+    void perform_op(const double* x_in, double* y_out)
     {
         Rcpp::NumericVector x(ncol);
         std::copy(x_in, x_in + ncol, x.begin());
@@ -39,7 +39,7 @@ public:
     }
 
     // y_out = A' * x_in
-    void perform_tprod(double* x_in, double* y_out)
+    void perform_tprod(const double* x_in, double* y_out)
     {
         Rcpp::NumericVector x(nrow);
         std::copy(x_in, x_in + nrow, x.begin());

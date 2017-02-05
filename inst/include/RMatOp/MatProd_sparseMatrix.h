@@ -9,6 +9,7 @@ class MatProd_sparseMatrix: public MatProd
 {
 private:
     typedef Eigen::MappedSparseMatrix<double, Storage> MapSpMat;
+    typedef Eigen::Map<const Eigen::VectorXd> MapConstVec;
     typedef Eigen::Map<Eigen::VectorXd> MapVec;
 
     // Map to Eigen sparse matrix
@@ -27,16 +28,16 @@ public:
     int cols() const { return ncol; }
 
     // y_out = A * x_in
-    void perform_op(double* x_in, double* y_out)
+    void perform_op(const double* x_in, double* y_out)
     {
-        MapVec x(x_in, ncol);
+        MapConstVec x(x_in, ncol);
         MapVec y(y_out, nrow);
         y.noalias() = mat * x;
     }
 
-    void perform_tprod(double* x_in, double* y_out)
+    void perform_tprod(const double* x_in, double* y_out)
     {
-        MapVec x(x_in, nrow);
+        MapConstVec x(x_in, nrow);
         MapVec y(y_out, ncol);
         y.noalias() = mat.transpose() * x;
     }

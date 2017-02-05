@@ -29,7 +29,7 @@ public:
     int cols() const { return n; }
 
     // y_out = A * x_in
-    void perform_op(double* x_in, double* y_out)
+    void perform_op(const double* x_in, double* y_out)
     {
         F77_CALL(dsymv)(&uplo, &n,
                         &BLAS_alpha, mat_ptr, &n,
@@ -37,7 +37,7 @@ public:
                         y_out, &BLAS_one);
     }
 
-    void perform_tprod(double* x_in, double* y_out)
+    void perform_tprod(const double* x_in, double* y_out)
     {
         perform_op(x_in, y_out);
     }

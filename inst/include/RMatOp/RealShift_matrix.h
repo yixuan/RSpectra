@@ -8,13 +8,14 @@ class RealShift_matrix: public RealShift
 {
 private:
     typedef Eigen::MatrixXd Matrix;
-    typedef Eigen::Map<Eigen::MatrixXd> MapMat;
+    typedef Eigen::Map<const Eigen::MatrixXd> MapConstMat;
+    typedef Eigen::Map<const Eigen::VectorXd> MapConstVec;
     typedef Eigen::Map<Eigen::VectorXd> MapVec;
     typedef Eigen::PartialPivLU<Eigen::MatrixXd> LUSolver;
 
-    MapMat    mat;
-    const int n;
-    LUSolver  solver;
+    MapConstMat mat;
+    const int  n;
+    LUSolver   solver;
 
 public:
     RealShift_matrix(SEXP mat_, const int nrow_) :
@@ -31,9 +32,9 @@ public:
     }
 
     // y_out = inv(A - sigma * I) * x_in
-    void perform_op(double* x_in, double* y_out)
+    void perform_op(const double* x_in, double* y_out)
     {
-        MapVec x(x_in, n);
+        MapConstVec x(x_in, n);
         MapVec y(y_out, n);
         y.noalias() = solver.solve(x);
     }

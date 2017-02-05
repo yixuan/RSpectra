@@ -17,8 +17,8 @@ public:
     {}
     int rows() const { return n; }
     int cols() const { return n; }
-    void perform_op(double* x_in, double* y_out) { op(x_in, y_out, n, data); }
-    void perform_tprod(double* x_in, double* y_out) {}
+    void perform_op(const double* x_in, double* y_out) { op(x_in, y_out, n, data); }
+    void perform_tprod(const double* x_in, double* y_out) {}
 };
 
 class CRealShift: public RealShift
@@ -36,7 +36,7 @@ public:
     int rows() const { return n; }
     int cols() const { return n; }
     void set_shift(double sigma) {}
-    void perform_op(double* x_in, double* y_out) { op(x_in, y_out, n, data); }
+    void perform_op(const double* x_in, double* y_out) { op(x_in, y_out, n, data); }
 };
 
 class CComplexShift: public ComplexShift
@@ -54,7 +54,7 @@ public:
     int rows() const { return n; }
     int cols() const { return n; }
     void set_shift(double sigmar, double sigmai) {}
-    void perform_op(double* x_in, double* y_out) { op(x_in, y_out, n, data); }
+    void perform_op(const double* x_in, double* y_out) { op(x_in, y_out, n, data); }
 };
 
 

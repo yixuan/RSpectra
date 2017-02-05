@@ -9,6 +9,7 @@ class MatProd_sym_sparseMatrix: public MatProd
 {
 private:
     typedef Eigen::MappedSparseMatrix<double, Storage> MapSpMat;
+    typedef Eigen::Map<const Eigen::VectorXd> MapConstVec;
     typedef Eigen::Map<Eigen::VectorXd> MapVec;
 
     // Map to Eigen sparse matrix
@@ -27,9 +28,9 @@ public:
     int cols() const { return n; }
 
     // y_out = A * x_in
-    void perform_op(double* x_in, double* y_out)
+    void perform_op(const double* x_in, double* y_out)
     {
-        MapVec x(x_in, n);
+        MapConstVec x(x_in, n);
         MapVec y(y_out, n);
 
         if(uplo == 'L')
@@ -38,7 +39,7 @@ public:
             y.noalias() = mat.template selfadjointView<Eigen::Upper>() * x;
     }
 
-    void perform_tprod(double* x_in, double* y_out)
+    void perform_tprod(const double* x_in, double* y_out)
     {
         perform_op(x_in, y_out);
     }
