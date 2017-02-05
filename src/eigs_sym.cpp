@@ -8,11 +8,6 @@ using namespace Spectra;
 using Rcpp::as;
 typedef Eigen::Map<Eigen::MatrixXd> MapMat;
 
-enum SOLVER_TYPE {
-    REGULAR = 0,
-    REAL_SHIFT
-};
-
 /************************ Macros to generate code ************************/
 
 #define EIG_COMMON_CODE                                                        \

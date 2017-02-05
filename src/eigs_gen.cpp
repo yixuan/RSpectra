@@ -7,12 +7,6 @@
 using namespace Spectra;
 using Rcpp::as;
 
-enum SOLVER_TYPE {
-    REGULAR = 0,
-    REAL_SHIFT,
-    COMPLEX_SHIFT
-};
-
 /************************ Macros to generate code ************************/
 
 #define EIG_COMMON_CODE                                                        \
