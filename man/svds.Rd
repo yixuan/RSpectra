@@ -2,12 +2,12 @@
 % Please edit documentation in R/30_svds.R
 \name{svds}
 \alias{svds}
+\alias{svds.matrix}
+\alias{svds.dgeMatrix}
 \alias{svds.dgCMatrix}
 \alias{svds.dgRMatrix}
-\alias{svds.dgeMatrix}
 \alias{svds.dsyMatrix}
 \alias{svds.function}
-\alias{svds.matrix}
 \title{Find the Largest k Singular Values/Vectors of a Matrix}
 \usage{
 svds(A, k, nu = k, nv = k, opts = list(), ...)
@@ -39,6 +39,9 @@ be between 0 and \code{k}.}
 \item{opts}{Control parameters related to the computing
 algorithm. See \strong{Details} below.}
 
+\item{\dots}{Arguments for specialized S3 function calls, for example
+\code{Atrans}, \code{dim} and \code{args}.}
+
 \item{Atrans}{Only used when \code{A} is a function. \code{A} is a function
 that calculates the matrix multiplication \eqn{Ax}{A * x}, and
 \code{Atrans} is a function that calculates the transpose
@@ -49,9 +52,6 @@ dimension of the implicit matrix. A vector of length two.}
 
 \item{args}{Only used when \code{A} is a function. This argument
 will be passed to the \code{A} and \code{Atrans} functions.}
-
-\item{\dots}{Arguments for specialized S3 function calls, for example
-\code{Atrans}, \code{dim} and \code{args}.}
 }
 \value{
 A list with the following components:
@@ -134,6 +134,7 @@ arguments can be passed in through the
 \code{args} parameter. In \code{svds()}, user should also provide
 the dimension of the implicit matrix through the argument \code{dim}.
 }
+
 \examples{
 m = 100
 n = 20
@@ -167,12 +168,11 @@ Atf = function(x, args)
 svds(Af, k, Atrans = Atf, dim = c(m, n), args = Asp1)
 
 }
-\author{
-Yixuan Qiu <\url{http://statr.me}>
-}
 \seealso{
 \code{\link[base]{eigen}()}, \code{\link[base]{svd}()},
 \code{\link[RSpectra]{eigs}()}.
 }
+\author{
+Yixuan Qiu <\url{http://statr.me}>
+}
 \keyword{array}
-

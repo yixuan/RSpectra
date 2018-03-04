@@ -1,8 +1,8 @@
 Package: RSpectra
 Type: Package
 Title: Solvers for Large Scale Eigenvalue and SVD Problems
-Version: 0.12-2
-Date: 2017-02-05
+Version: 0.13-0
+Date: 2018-03-03
 Authors@R: c(
     person("Yixuan", "Qiu", , "yixuan.qiu@cos.name", c("aut", "cre")),
     person("Jiali", "Mei", , "vermouthmjl@gmail.com", "aut",
@@ -13,7 +13,7 @@ Authors@R: c(
            comment = "Eigenvalue solvers from the 'Eigen' library")
     )
 Description: R interface to the 'Spectra' library
-    <http://yixuan.cos.name/spectra/> for large scale eigenvalue and SVD
+    <https://spectralib.org/> for large scale eigenvalue and SVD
     problems. It is typically used to compute a few
     eigenvalues/vectors of an n by n matrix, e.g., the k largest eigenvalues,
     which is usually more efficient than eigen() if k << n. This package
@@ -31,8 +31,7 @@ Imports:
     Matrix (>= 1.1-0),
     Rcpp (>= 0.11.5)
 Suggests:
-    knitr,
-    prettydoc
+    knitr, rmarkdown, prettydoc
 LinkingTo: Rcpp, RcppEigen (>= 0.3.2.2.0)
-VignetteBuilder: knitr
-RoxygenNote: 5.0.1
+VignetteBuilder: knitr, rmarkdown, prettydoc
+RoxygenNote: 6.0.1

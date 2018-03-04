@@ -1,5 +1,5 @@
 ---
-title: "Large Scale Eigenvalue Decomposition and SVD with RSpectra"
+title: "Large-Scale Eigenvalue Decomposition and SVD with RSpectra"
 author: "Yixuan Qiu"
 date: "`r Sys.Date()`"
 output:
@@ -7,7 +7,7 @@ output:
     theme: cayman
     highlight: github
 vignette: >
-  %\VignetteIndexEntry{Large Scale Eigenvalue Decomposition and SVD with RSpectra}
+  %\VignetteIndexEntry{Large-Scale Eigenvalue Decomposition and SVD with RSpectra}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -39,7 +39,7 @@ suitable for these special needs.
 
 And this is why the **RSpectra** package was developed. **RSpectra** provides
 an R interface to the
-[Spectra](http://yixuan.cos.name/spectra/) library, which is used to solve
+[Spectra](https://spectralib.org/) library, which is used to solve
 large scale eigenvalue problems. The core part of **Spectra** and **RSpectra**
 was written in efficient C++ code, and they can handle large scale matrices
 in either dense or sparse formats.
@@ -198,7 +198,7 @@ str(svds(Af, k, Atrans = Atransf, dim = c(m, n), args = Asp))
 ## Performance
 
 **RSpectra** is written in efficient C++ code.
-[This page](http://yixuan.cos.name/spectra/performance.html) gives some
+[This page](https://spectralib.org/performance.html) gives some
 benchmarking results of `svds()` with other similar functions available in R
 and extension packages.
 

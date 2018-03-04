@@ -2,12 +2,12 @@
 % Please edit documentation in R/00_eigs.R
 \name{eigs}
 \alias{eigs}
+\alias{eigs.matrix}
+\alias{eigs.dgeMatrix}
 \alias{eigs.dgCMatrix}
 \alias{eigs.dgRMatrix}
-\alias{eigs.dgeMatrix}
 \alias{eigs.dsyMatrix}
 \alias{eigs.function}
-\alias{eigs.matrix}
 \alias{eigs_sym}
 \alias{eigs_sym.function}
 \title{Find a Specified Number of Eigenvalues/vectors for Square Matrix}
@@ -53,6 +53,9 @@ See section \strong{Function Interface} for details.}
 \item{opts}{Control parameters related to the computing
 algorithm. See \strong{Details} below.}
 
+\item{\dots}{Arguments for specialized S3 function calls, for example
+\code{lower}, \code{n} and \code{args}.}
+
 \item{n}{Only used when \code{A} is a function, to specify the
 dimension of the implicit matrix. See section
 \strong{Function Interface} for details.}
@@ -63,9 +66,6 @@ See section \strong{Function Interface} for details.}
 
 \item{lower}{For symmetric matrices, should the lower triangle
 or upper triangle be used.}
-
-\item{\dots}{Arguments for specialized S3 function calls, for example
-\code{lower}, \code{n} and \code{args}.}
 }
 \value{
 A list of converged eigenvalues and eigenvectors.
@@ -197,6 +197,7 @@ of the same length. The function should have the effect of calculating
 \code{args} parameter. In \code{eigs()}, user should also provide
 the dimension of the implicit matrix through the argument \code{n}.
 }
+
 \examples{
 library(Matrix)
 n = 20
@@ -238,14 +239,13 @@ eigs_sym(A5, k, sigma = 0)
 ## The results should be the same,
 ## but the latter method is far more stable on large matrices
 }
+\seealso{
+\code{\link[base]{eigen}()}, \code{\link[base]{svd}()},
+         \code{\link[RSpectra]{svds}()}
+}
 \author{
 Yixuan Qiu \url{http://statr.me}
 
         Jiali Mei \email{vermouthmjl@gmail.com}
 }
-\seealso{
-\code{\link[base]{eigen}()}, \code{\link[base]{svd}()},
-         \code{\link[RSpectra]{svds}()}
-}
 \keyword{array}
-
