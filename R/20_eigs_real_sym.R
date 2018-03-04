@@ -79,12 +79,10 @@ eigs_real_sym <- function(A, n, k, which, sigma, opts, mattype, extra_args = lis
                  regular = "eigs_sym",
                  real_shift = "eigs_shift_sym",
                  stop("unknown work mode"))
-    res = .Call(fun,
-                A,
-                as.integer(n), as.integer(k),
-                as.list(spectra.param),
-                as.integer(MAT_TYPE[mattype]),
-                PACKAGE = "RSpectra")
-
-    return(res)
+    dot_call_args = list(
+        fun,
+        A, as.integer(n), as.integer(k), as.list(spectra.param), as.integer(MAT_TYPE[mattype]),
+        PACKAGE = "RSpectra"
+    )
+    do.call(.Call, args = dot_call_args)
 }

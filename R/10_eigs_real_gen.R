@@ -100,12 +100,10 @@ eigs_real_gen <- function(A, n, k, which, sigma, opts, mattype, extra_args = lis
                  real_shift = "eigs_real_shift_gen",
                  complex_shift = "eigs_complex_shift_gen",
                  stop("unknown work mode"))
-    res = .Call(fun,
-                A,
-                as.integer(n), as.integer(k),
-                as.list(spectra.param),
-                as.integer(MAT_TYPE[mattype]),
-                PACKAGE = "RSpectra")
-
-    return(res)
+    dot_call_args = list(
+        fun,
+        A, as.integer(n), as.integer(k), as.list(spectra.param), as.integer(MAT_TYPE[mattype]),
+        PACKAGE = "RSpectra"
+    )
+    do.call(.Call, args = dot_call_args)
 }
