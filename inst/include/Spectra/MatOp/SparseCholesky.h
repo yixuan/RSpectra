@@ -1,8 +1,8 @@
-// Copyright (C) 2016-2017 Yixuan Qiu <yixuan.qiu@cos.name>
+// Copyright (C) 2016-2018 Yixuan Qiu <yixuan.qiu@cos.name>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
-// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #ifndef SPARSE_CHOLESKY_H
 #define SPARSE_CHOLESKY_H
@@ -11,6 +11,7 @@
 #include <Eigen/SparseCore>
 #include <Eigen/SparseCholesky>
 #include <stdexcept>
+#include <Util/CompInfo.h>
 
 namespace Spectra {
 
@@ -34,6 +35,7 @@ private:
 
     const int m_n;
     Eigen::SimplicialLLT<SparseMatrix, Uplo> m_decomp;
+    int m_info;  // status of the decomposition
 
 public:
     ///
@@ -49,19 +51,28 @@ public:
             throw std::invalid_argument("SparseCholesky: matrix must be square");
 
         m_decomp.compute(mat_);
+        m_info = (m_decomp.info() == Eigen::Success) ?
+                 SUCCESSFUL :
+                 NUMERICAL_ISSUE;
     }
 
     ///
-    /// Return the number of rows of the underlying matrix.
+    /// Returns the number of rows of the underlying matrix.
     ///
     int rows() const { return m_n; }
     ///
-    /// Return the number of columns of the underlying matrix.
+    /// Returns the number of columns of the underlying matrix.
     ///
     int cols() const { return m_n; }
 
     ///
-    /// Perform the lower triangular solving operation \f$y=L^{-1}x\f$.
+    /// Returns the status of the computation.
+    /// The full list of enumeration values can be found in \ref Enumerations.
+    ///
+    int info() const { return m_info; }
+
+    ///
+    /// Performs the lower triangular solving operation \f$y=L^{-1}x\f$.
     ///
     /// \param x_in  Pointer to the \f$x\f$ vector.
     /// \param y_out Pointer to the \f$y\f$ vector.
@@ -76,7 +87,7 @@ public:
     }
 
     ///
-    /// Perform the upper triangular solving operation \f$y=(L')^{-1}x\f$.
+    /// Performs the upper triangular solving operation \f$y=(L')^{-1}x\f$.
     ///
     /// \param x_in  Pointer to the \f$x\f$ vector.
     /// \param y_out Pointer to the \f$y\f$ vector.

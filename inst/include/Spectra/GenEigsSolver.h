@@ -1,8 +1,8 @@
-// Copyright (C) 2016-2017 Yixuan Qiu <yixuan.qiu@cos.name>
+// Copyright (C) 2016-2018 Yixuan Qiu <yixuan.qiu@cos.name>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
-// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #ifndef GEN_EIGS_SOLVER_H
 #define GEN_EIGS_SOLVER_H
@@ -14,6 +14,7 @@
 #include <complex>    // std::complex, std::conj, std::norm, std::abs
 #include <stdexcept>  // std::invalid_argument
 
+#include "Util/TypeTraits.h"
 #include "Util/SelectionRule.h"
 #include "Util/CompInfo.h"
 #include "Util/SimpleRandom.h"
@@ -172,12 +173,11 @@ private:
     BoolArray m_ritz_conv;    // indicator of the convergence of ritz values
     int m_info;               // status of the computation
 
+    const Scalar m_near_0;    // a very small value, but 1.0 / m_safe_min does not overflow
+                              // ~= 1e-307 for the "double" type
     const Scalar m_eps;       // the machine precision,
                               // e.g. ~= 1e-16 for the "double" type
-    const Scalar m_approx_0;  // a number that is approximately zero
-                              // m_eps23 = m_eps^(2/3)
-                              // used to test whether a number is complex, and
-                              // to test the orthogonality of vectors
+    const Scalar m_eps23;     // m_eps^(2/3), used to test the convergence
 
     // Arnoldi factorization starting from step-k
     void factorize_from(int from_k, int to_m, const Vector& fk)
@@ -186,7 +186,10 @@ private:
 
         m_fac_f = fk;
 
+        // Pre-allocate Vf
+        Vector Vf(to_m);
         Vector w(m_n);
+
         Scalar beta = m_fac_f.norm();
         // Keep the upperleft k x k submatrix of H and set other elements to 0
         m_fac_H.rightCols(m_ncv - from_k).setZero();
@@ -197,14 +200,14 @@ private:
             // If beta = 0, then the next V is not full rank
             // We need to generate a new residual vector that is orthogonal
             // to the current V, which we call a restart
-            if(beta < m_eps)
+            if(beta < m_near_0)
             {
                 SimpleRandom<Scalar> rng(2 * i);
                 m_fac_f.noalias() = rng.random_vec(m_n);
                 // f <- f - V * V' * f, so that f is orthogonal to V
                 MapMat V(m_fac_V.data(), m_n, i); // The first i columns
-                Vector Vf = V.transpose() * m_fac_f;
-                m_fac_f.noalias() -= V * Vf;
+                Vf.head(i).noalias() = V.transpose() * m_fac_f;
+                m_fac_f.noalias() -= V * Vf.head(i);
                 // beta <- ||f||
                 beta = m_fac_f.norm();
 
@@ -224,10 +227,11 @@ private:
             m_op->perform_op(&m_fac_V(0, i), w.data());
             m_nmatop++;
 
+            const int i1 = i + 1;
             // First i+1 columns of V
-            MapMat Vs(m_fac_V.data(), m_n, i + 1);
+            MapMat Vs(m_fac_V.data(), m_n, i1);
             // h = m_fac_H(0:i, i)
-            MapVec h(&m_fac_H(0, i), i + 1);
+            MapVec h(&m_fac_H(0, i), i1);
             // h <- V' * w
             h.noalias() = Vs.transpose() * w;
 
@@ -240,19 +244,19 @@ private:
 
             // f/||f|| is going to be the next column of V, so we need to test
             // whether V' * (f/||f||) ~= 0
-            Vector Vf = Vs.transpose() * m_fac_f;
+            Vf.head(i1).noalias() = Vs.transpose() * m_fac_f;
             // If not, iteratively correct the residual
             int count = 0;
-            while(count < 5 && Vf.cwiseAbs().maxCoeff() > m_approx_0 * beta)
+            while(count < 5 && Vf.head(i1).cwiseAbs().maxCoeff() > m_eps * beta)
             {
                 // f <- f - V * Vf
-                m_fac_f.noalias() -= Vs * Vf;
+                m_fac_f.noalias() -= Vs * Vf.head(i1);
                 // h <- h + Vf
-                h.noalias() += Vf;
+                h.noalias() += Vf.head(i1);
                 // beta <- ||f||
                 beta = m_fac_f.norm();
 
-                Vf.noalias() = Vs.transpose() * m_fac_f;
+                Vf.head(i1).noalias() = Vs.transpose() * m_fac_f;
                 count++;
             }
         }
@@ -286,8 +290,8 @@ private:
                 // H <- R2 * Q2 + conj(mu) * I = Q2' * H * Q2
                 //
                 // (H - mu * I) * (H - conj(mu) * I) = Q1 * Q2 * R2 * R1 = Q * R
-                Scalar s = 2 * m_ritz_val[i].real();
-                Scalar t = norm(m_ritz_val[i]);
+                const Scalar s = Scalar(2) * m_ritz_val[i].real();
+                const Scalar t = norm(m_ritz_val[i]);
 
                 decomp_ds.compute(m_fac_H, s, t);
 
@@ -297,7 +301,7 @@ private:
                 // Matrix Q = Matrix::Identity(m_ncv, m_ncv);
                 // decomp_ds.apply_YQ(Q);
                 // m_fac_H = Q.transpose() * m_fac_H * Q;
-                m_fac_H = decomp_ds.matrix_QtHQ();
+                m_fac_H.noalias() = decomp_ds.matrix_QtHQ();
 
                 i++;
             } else {
@@ -308,7 +312,7 @@ private:
                 // Q -> Q * Qi
                 decomp_hb.apply_YQ(Q);
                 // H -> Q'HQ = RQ + mu * I
-                m_fac_H = decomp_hb.matrix_RQ();
+                decomp_hb.matrix_RQ(m_fac_H);
                 m_fac_H.diagonal().array() += m_ritz_val[i].real();
             }
         }
@@ -327,16 +331,16 @@ private:
         Vs.col(k).noalias() = m_fac_V * Q.col(k);
         m_fac_V.leftCols(k + 1).noalias() = Vs;
 
-        Vector fk = m_fac_f * Q(m_ncv - 1, k - 1) + m_fac_V.col(k) * m_fac_H(k, k - 1);
+        const Vector fk = m_fac_f * Q(m_ncv - 1, k - 1) + m_fac_V.col(k) * m_fac_H(k, k - 1);
         factorize_from(k, m_ncv, fk);
         retrieve_ritzpair();
     }
 
-    // Calculate the number of converged Ritz values
+    // Calculates the number of converged Ritz values
     int num_converged(Scalar tol)
     {
-        // thresh = tol * max(m_approx_0, abs(theta)), theta for ritz value
-        Array thresh = tol * m_ritz_val.head(m_nev).array().abs().max(m_approx_0);
+        // thresh = tol * max(m_eps23, abs(theta)), theta for ritz value
+        Array thresh = tol * m_ritz_val.head(m_nev).array().abs().max(m_eps23);
         Array resid = m_ritz_est.head(m_nev).array().abs() * m_fac_f.norm();
         // Converged "wanted" ritz values
         m_ritz_conv = (resid < thresh);
@@ -344,16 +348,16 @@ private:
         return m_ritz_conv.cast<int>().sum();
     }
 
-    // Return the adjusted nev for restarting
+    // Returns the adjusted nev for restarting
     int nev_adjusted(int nconv)
     {
         using std::abs;
 
         int nev_new = m_nev;
         for(int i = m_nev; i < m_ncv; i++)
-            if(abs(m_ritz_est[i]) < m_eps)  nev_new++;
+            if(abs(m_ritz_est[i]) < m_near_0)  nev_new++;
 
-        // Adjust nev_new again, according to dnaup2.f line 660~674 in ARPACK
+        // Adjust nev_new, according to dnaup2.f line 660~674 in ARPACK
         nev_new += std::min(nconv, (m_ncv - nev_new) / 2);
         if(nev_new == 1 && m_ncv >= 6)
             nev_new = m_ncv / 2;
@@ -374,11 +378,11 @@ private:
         return nev_new;
     }
 
-    // Retrieve and sort ritz values and ritz vectors
+    // Retrieves and sorts ritz values and ritz vectors
     void retrieve_ritzpair()
     {
         UpperHessenbergEigen<Scalar> decomp(m_fac_H);
-        ComplexVector evals = decomp.eigenvalues();
+        const ComplexVector& evals = decomp.eigenvalues();
         ComplexMatrix evecs = decomp.eigenvectors();
 
         SortEigenvalue<Complex, SelectionRule> sorting(evals.data(), evals.size());
@@ -397,7 +401,7 @@ private:
     }
 
 protected:
-    // Sort the first nev Ritz pairs in the specified order
+    // Sorts the first nev Ritz pairs in the specified order
     // This is used to return the final results
     virtual void sort_ritzpair(int sort_rule)
     {
@@ -485,8 +489,9 @@ public:
         m_nmatop(0),
         m_niter(0),
         m_info(NOT_COMPUTED),
+        m_near_0(TypeTraits<Scalar>::min() * Scalar(10)),
         m_eps(Eigen::NumTraits<Scalar>::epsilon()),
-        m_approx_0(Eigen::numext::pow(m_eps, Scalar(2.0) / 3))
+        m_eps23(Eigen::numext::pow(m_eps, Scalar(2.0) / 3))
     {
         if(nev_ < 1 || nev_ > m_n - 2)
             throw std::invalid_argument("nev must satisfy 1 <= nev <= n - 2, n is the size of matrix");
@@ -496,7 +501,12 @@ public:
     }
 
     ///
-    /// Providing the initial residual vector for the algorithm.
+    /// Virtual destructor
+    ///
+    virtual ~GenEigsSolver() {}
+
+    ///
+    /// Initializes the solver by providing an initial residual vector.
     ///
     /// \param init_resid Pointer to the initial residual vector.
     ///
@@ -523,10 +533,11 @@ public:
         m_ritz_est.setZero();
         m_ritz_conv.setZero();
 
+        // Set the initial vector
         Vector v(m_n);
         std::copy(init_resid, init_resid + m_n, v.data());
         Scalar vnorm = v.norm();
-        if(vnorm < m_eps)
+        if(vnorm < m_near_0)
             throw std::invalid_argument("initial residual vector cannot be zero");
         v /= vnorm;
 
@@ -540,7 +551,7 @@ public:
     }
 
     ///
-    /// Providing a random initial residual vector.
+    /// Initializes the solver by providing a random initial residual vector.
     ///
     /// This overloaded function generates a random initial residual vector
     /// (with a fixed random seed) for the algorithm. Elements in the vector
@@ -554,7 +565,7 @@ public:
     }
 
     ///
-    /// Conducting the major computation procedure.
+    /// Conducts the major computation procedure.
     ///
     /// \param maxit      Maximum number of iterations allowed in the algorithm.
     /// \param tol        Precision parameter for the calculated eigenvalues.
@@ -599,29 +610,29 @@ public:
     }
 
     ///
-    /// Retuning the status of the computation.
+    /// Returns the status of the computation.
     /// The full list of enumeration values can be found in \ref Enumerations.
     ///
-    int info() { return m_info; }
+    int info() const { return m_info; }
 
     ///
-    /// Returning the number of iterations used in the computation.
+    /// Returns the number of iterations used in the computation.
     ///
-    int num_iterations() { return m_niter; }
+    int num_iterations() const { return m_niter; }
 
     ///
-    /// Returning the number of matrix operations used in the computation.
+    /// Returns the number of matrix operations used in the computation.
     ///
-    int num_operations() { return m_nmatop; }
+    int num_operations() const { return m_nmatop; }
 
     ///
-    /// Returning the converged eigenvalues.
+    /// Returns the converged eigenvalues.
     ///
     /// \return A complex-valued vector containing the eigenvalues.
     /// Returned vector type will be `Eigen::Vector<std::complex<Scalar>, ...>`, depending on
     /// the template parameter `Scalar` defined.
     ///
-    ComplexVector eigenvalues()
+    ComplexVector eigenvalues() const
     {
         int nconv = m_ritz_conv.cast<int>().sum();
         ComplexVector res(nconv);
@@ -643,7 +654,7 @@ public:
     }
 
     ///
-    /// Returning the eigenvectors associated with the converged eigenvalues.
+    /// Returns the eigenvectors associated with the converged eigenvalues.
     ///
     /// \param nvec The number of eigenvectors to return.
     ///
@@ -651,7 +662,7 @@ public:
     /// Returned matrix type will be `Eigen::Matrix<std::complex<Scalar>, ...>`,
     /// depending on the template parameter `Scalar` defined.
     ///
-    ComplexMatrix eigenvectors(int nvec)
+    ComplexMatrix eigenvectors(int nvec) const
     {
         int nconv = m_ritz_conv.cast<int>().sum();
         nvec = std::min(nvec, nconv);
@@ -677,9 +688,9 @@ public:
     }
 
     ///
-    /// Returning all converged eigenvectors.
+    /// Returns all converged eigenvectors.
     ///
-    ComplexMatrix eigenvectors()
+    ComplexMatrix eigenvectors() const
     {
         return eigenvectors(m_nev);
     }
