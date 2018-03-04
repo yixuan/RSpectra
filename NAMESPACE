@@ -25,3 +25,5 @@ S3method(svds, "function")
 export(eigs)
 export(eigs_sym)
 export(svds)
+
+useDynLib(RSpectra)
