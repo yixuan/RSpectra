@@ -5,7 +5,8 @@
   \subsection{NEW FEATURES}{
     \itemize{
       \item Using \pkg{prettydoc} to format vignette.
-      \item Updated Spectra to v0.6.1.
+      \item Updated Spectra to v0.6.1 that improves numerical accuracy of
+            eigen-solvers.
     }
   }
   \subsection{BUG FIXES}{
