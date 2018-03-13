@@ -1,10 +1,10 @@
-##' Find a Specified Number of Eigenvalues/vectors for Square Matrix
+##' Find a Specified Number of Eigenvalues/vectors of a Square Matrix
 ##'
 ##' @description
 ##' Given an \eqn{n} by \eqn{n} matrix \eqn{A},
-##' function \code{eigs()} can calculate a limited
+##' function \code{eigs()} can calculate a specified
 ##' number of eigenvalues and eigenvectors of \eqn{A}.
-##' Users can specify the selection criteria by argument
+##' Users can specify the selection criterion by argument
 ##' \code{which}, e.g., choosing the \eqn{k} largest or smallest
 ##' eigenvalues and the corresponding eigenvectors.
 ##'
@@ -12,14 +12,14 @@
 ##'
 ##' \tabular{ll}{
 ##'   \code{matrix}     \tab The most commonly used matrix type,
-##'                          defined in \strong{base} package.\cr
+##'                          defined in the \strong{base} package.\cr
 ##'   \code{dgeMatrix}  \tab General matrix, equivalent to \code{matrix},
-##'                          defined in \strong{Matrix} package.\cr
+##'                          defined in the \strong{Matrix} package.\cr
 ##'   \code{dgCMatrix}  \tab Column oriented sparse matrix, defined in
-##'                          \strong{Matrix} package.\cr
+##'                          the \strong{Matrix} package.\cr
 ##'   \code{dgRMatrix}  \tab Row oriented sparse matrix, defined in
-##'                          \strong{Matrix} package.\cr
-##'   \code{dsyMatrix}  \tab Symmetrix matrix, defined in \strong{Matrix}
+##'                          the \strong{Matrix} package.\cr
+##'   \code{dsyMatrix}  \tab Symmetrix matrix, defined in the \strong{Matrix}
 ##'                          package.\cr
 ##'   \code{function}   \tab Implicitly specify the matrix through a
 ##'                          function that has the effect of calculating
@@ -31,9 +31,9 @@
 ##' and only the lower triangle (or upper triangle, which is
 ##' controlled by the argument \code{lower}) is used for
 ##' computation, which guarantees that the eigenvalues and eigenvectors are
-##' real, and in some cases reduces the workload. One exception is when
-##' \code{A} is a function, in which case the user is responsible for the
-##' symmetry of the operator.
+##' real, and in general results in faster and more stable computation.
+##' One exception is when \code{A} is a function, in which case the user is
+##' responsible for the symmetry of the operator.
 ##'
 ##' \code{eigs_sym()} supports "matrix", "dgeMatrix", "dgCMatrix", "dgRMatrix"
 ##' and "function" typed matrices.
@@ -43,7 +43,7 @@
 ##'          and calculates \eqn{Ax}{A * x}.
 ##'          See section \strong{Function Interface} for details.
 ##' @param k Number of eigenvalues requested.
-##' @param which Selection criteria. See \strong{Details} below.
+##' @param which Selection criterion. See \strong{Details} below.
 ##' @param sigma Shift parameter. See section \strong{Shift-And-Invert Mode}.
 ##' @param opts Control parameters related to the computing
 ##'             algorithm. See \strong{Details} below.
@@ -121,7 +121,7 @@
 ##' in that \code{eigs()} is good at finding large
 ##' eigenvalues rather than small ones. More explanation of the
 ##' shift-and-invert mode can be found in the SciPy document,
-##' \url{http://docs.scipy.org/doc/scipy/reference/tutorial/arpack.html}.
+##' \url{https://docs.scipy.org/doc/scipy/reference/tutorial/arpack.html}.
 ##'
 ##' @section Function Interface:
 ##' The matrix \eqn{A} can be specified through a function with
@@ -144,7 +144,7 @@
 ##' \item{nconv}{Number of converged eigenvalues.}
 ##' \item{niter}{Number of iterations used in the computation.}
 ##' \item{nops}{Number of matrix operations used in the computation.}
-##' @author Yixuan Qiu \url{http://statr.me}
+##' @author Yixuan Qiu \url{https://statr.me}
 ##'
 ##'         Jiali Mei \email{vermouthmjl@@gmail.com}
 ##' @seealso \code{\link[base]{eigen}()}, \code{\link[base]{svd}()},

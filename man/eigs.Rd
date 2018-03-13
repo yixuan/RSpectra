@@ -10,7 +10,7 @@
 \alias{eigs.function}
 \alias{eigs_sym}
 \alias{eigs_sym.function}
-\title{Find a Specified Number of Eigenvalues/vectors for Square Matrix}
+\title{Find a Specified Number of Eigenvalues/vectors of a Square Matrix}
 \usage{
 eigs(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 
@@ -46,7 +46,7 @@ See section \strong{Function Interface} for details.}
 
 \item{k}{Number of eigenvalues requested.}
 
-\item{which}{Selection criteria. See \strong{Details} below.}
+\item{which}{Selection criterion. See \strong{Details} below.}
 
 \item{sigma}{Shift parameter. See section \strong{Shift-And-Invert Mode}.}
 
@@ -77,9 +77,9 @@ A list of converged eigenvalues and eigenvectors.
 }
 \description{
 Given an \eqn{n} by \eqn{n} matrix \eqn{A},
-function \code{eigs()} can calculate a limited
+function \code{eigs()} can calculate a specified
 number of eigenvalues and eigenvectors of \eqn{A}.
-Users can specify the selection criteria by argument
+Users can specify the selection criterion by argument
 \code{which}, e.g., choosing the \eqn{k} largest or smallest
 eigenvalues and the corresponding eigenvectors.
 
@@ -87,14 +87,14 @@ Currently \code{eigs()} supports matrices of the following classes:
 
 \tabular{ll}{
   \code{matrix}     \tab The most commonly used matrix type,
-                         defined in \strong{base} package.\cr
+                         defined in the \strong{base} package.\cr
   \code{dgeMatrix}  \tab General matrix, equivalent to \code{matrix},
-                         defined in \strong{Matrix} package.\cr
+                         defined in the \strong{Matrix} package.\cr
   \code{dgCMatrix}  \tab Column oriented sparse matrix, defined in
-                         \strong{Matrix} package.\cr
+                         the \strong{Matrix} package.\cr
   \code{dgRMatrix}  \tab Row oriented sparse matrix, defined in
-                         \strong{Matrix} package.\cr
-  \code{dsyMatrix}  \tab Symmetrix matrix, defined in \strong{Matrix}
+                         the \strong{Matrix} package.\cr
+  \code{dsyMatrix}  \tab Symmetrix matrix, defined in the \strong{Matrix}
                          package.\cr
   \code{function}   \tab Implicitly specify the matrix through a
                          function that has the effect of calculating
@@ -106,9 +106,9 @@ Currently \code{eigs()} supports matrices of the following classes:
 and only the lower triangle (or upper triangle, which is
 controlled by the argument \code{lower}) is used for
 computation, which guarantees that the eigenvalues and eigenvectors are
-real, and in some cases reduces the workload. One exception is when
-\code{A} is a function, in which case the user is responsible for the
-symmetry of the operator.
+real, and in general results in faster and more stable computation.
+One exception is when \code{A} is a function, in which case the user is
+responsible for the symmetry of the operator.
 
 \code{eigs_sym()} supports "matrix", "dgeMatrix", "dgCMatrix", "dgRMatrix"
 and "function" typed matrices.
@@ -178,7 +178,7 @@ using \code{which = "LM", sigma = 0} will be the same as
 in that \code{eigs()} is good at finding large
 eigenvalues rather than small ones. More explanation of the
 shift-and-invert mode can be found in the SciPy document,
-\url{http://docs.scipy.org/doc/scipy/reference/tutorial/arpack.html}.
+\url{https://docs.scipy.org/doc/scipy/reference/tutorial/arpack.html}.
 }
 
 \section{Function Interface}{
@@ -244,7 +244,7 @@ eigs_sym(A5, k, sigma = 0)
          \code{\link[RSpectra]{svds}()}
 }
 \author{
-Yixuan Qiu \url{http://statr.me}
+Yixuan Qiu \url{https://statr.me}
 
         Jiali Mei \email{vermouthmjl@gmail.com}
 }

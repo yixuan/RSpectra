@@ -77,14 +77,14 @@ Currently \code{svds()} supports matrices of the following classes:
 
 \tabular{ll}{
   \code{matrix}     \tab The most commonly used matrix type,
-                         defined in \strong{base} package.\cr
+                         defined in the \strong{base} package.\cr
   \code{dgeMatrix}  \tab General matrix, equivalent to \code{matrix},
-                         defined in \strong{Matrix} package.\cr
+                         defined in the \strong{Matrix} package.\cr
   \code{dgCMatrix}  \tab Column oriented sparse matrix, defined in
-                         \strong{Matrix} package.\cr
+                         the \strong{Matrix} package.\cr
   \code{dgRMatrix}  \tab Row oriented sparse matrix, defined in
-                         \strong{Matrix} package.\cr
-  \code{dsyMatrix}  \tab Symmetrix matrix, defined in \strong{Matrix}
+                         the \strong{Matrix} package.\cr
+  \code{dsyMatrix}  \tab Symmetrix matrix, defined in the \strong{Matrix}
                          package.\cr
   \code{function}   \tab Implicitly specify the matrix through two
                          functions that calculate
