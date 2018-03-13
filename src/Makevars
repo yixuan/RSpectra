@@ -1,10 +1,5 @@
 PKG_CPPFLAGS = -I../inst/include
 
-## With Rcpp 0.11.0 and later, we no longer need to set PKG_LIBS as there is
-## no user-facing library. The include path to headers is already set by R.
-#PKG_LIBS =
-PKG_LIBS = $(BLAS_LIBS) $(FLIBS)
-
 .PHONY: all clean
 
 all: $(SHLIB)
