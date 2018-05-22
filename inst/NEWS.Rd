@@ -1,6 +1,15 @@
 \name{NEWS}
 \title{News for Package "RSpectra"}
 
+\section{Changes in RSpectra version 0.13-1}{
+  \subsection{BUG FIXES}{
+     \itemize{
+       \item Updated Spectra to v0.6.2 that fixes regressions in v0.6.1
+             on some edge cases.
+     }
+   }
+}
+
 \section{Changes in RSpectra version 0.13-0}{
   \subsection{NEW FEATURES}{
     \itemize{
