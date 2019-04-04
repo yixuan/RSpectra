@@ -147,7 +147,7 @@
 ##' \item{nconv}{Number of converged eigenvalues.}
 ##' \item{niter}{Number of iterations used in the computation.}
 ##' \item{nops}{Number of matrix operations used in the computation.}
-##' @author Yixuan Qiu \url{http://statr.me}
+##' @author Yixuan Qiu \url{https://statr.me}
 ##'
 ##'         Jiali Mei \email{vermouthmjl@@gmail.com}
 ##' @seealso \code{\link[base]{eigen}()}, \code{\link[base]{svd}()},
