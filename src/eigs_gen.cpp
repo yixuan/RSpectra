@@ -10,7 +10,10 @@ using Rcpp::as;
 /************************ Macros to generate code ************************/
 
 #define EIG_COMMON_CODE                                                        \
-eigs.init();                                                         \
+if(user_initvec)                                                               \
+    eigs.init(initvec);                                                        \
+else                                                                           \
+    eigs.init();                                                               \
 nconv = eigs.compute(maxitr, tol);                                             \
 if(nconv < nev)                                                                \
     Rcpp::warning("only %d eigenvalue(s) converged, less than k = %d",         \
@@ -73,8 +76,11 @@ switch(rule)                                                                   \
 
 
 /************************ Regular mode ************************/
-Rcpp::RObject run_eigs_gen(MatProd* op, int n, int nev, int ncv, int rule,
-                           int maxitr, double tol, bool retvec)
+Rcpp::RObject run_eigs_gen(
+    MatProd* op, int n, int nev, int ncv, int rule,
+    int maxitr, double tol, bool retvec,
+    bool user_initvec, const double* initvec
+)
 {
     Rcpp::RObject evals, evecs;
     int nconv = 0, niter = 0, nops = 0;
@@ -91,8 +97,10 @@ Rcpp::RObject run_eigs_gen(MatProd* op, int n, int nev, int ncv, int rule,
 }
 
 
-RcppExport SEXP eigs_gen(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
-                         SEXP params_list_r, SEXP mattype_scalar_r)
+RcppExport SEXP eigs_gen(
+    SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
+    SEXP params_list_r, SEXP mattype_scalar_r
+)
 {
     BEGIN_RCPP
 
@@ -107,8 +115,18 @@ RcppExport SEXP eigs_gen(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
     bool retvec  = as<bool>(params_rcpp["retvec"]);
     int mattype  = as<int>(mattype_scalar_r);
 
+    const double* initvec = NULL;
+    bool user_initvec = as<bool>(params_rcpp["user_initvec"]);
+    if(user_initvec)
+    {
+        Rcpp::NumericVector v0 = params_rcpp["initvec"];
+        initvec = v0.begin();
+    }
+
     MatProd* op = get_mat_prod_op(A_mat_r, n, n, params_list_r, mattype);;
-    Rcpp::RObject res = run_eigs_gen(op, n, nev, ncv, rule, maxitr, tol, retvec);
+    Rcpp::RObject res = run_eigs_gen(op, n, nev, ncv, rule,
+                                     maxitr, tol, retvec,
+                                     user_initvec, initvec);
 
     delete op;
 
@@ -121,8 +139,11 @@ RcppExport SEXP eigs_gen(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
 
 
 /************************ Real shift mode ************************/
-Rcpp::RObject run_eigs_real_shift_gen(RealShift* op, int n, int nev, int ncv, int rule,
-                                      double sigmar, int maxitr, double tol, bool retvec)
+Rcpp::RObject run_eigs_real_shift_gen(
+    RealShift* op, int n, int nev, int ncv, int rule,
+    double sigmar, int maxitr, double tol, bool retvec,
+    bool user_initvec, const double* initvec
+)
 {
     Rcpp::RObject evals, evecs;
     int nconv = 0, niter = 0, nops = 0;
@@ -138,8 +159,10 @@ Rcpp::RObject run_eigs_real_shift_gen(RealShift* op, int n, int nev, int ncv, in
     );
 }
 
-RcppExport SEXP eigs_real_shift_gen(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
-                                    SEXP params_list_r, SEXP mattype_scalar_r)
+RcppExport SEXP eigs_real_shift_gen(
+    SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
+    SEXP params_list_r, SEXP mattype_scalar_r
+)
 {
     BEGIN_RCPP
 
@@ -155,8 +178,18 @@ RcppExport SEXP eigs_real_shift_gen(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar
     int mattype   = as<int>(mattype_scalar_r);
     double sigmar = as<double>(params_rcpp["sigmar"]);
 
+    const double* initvec = NULL;
+    bool user_initvec = as<bool>(params_rcpp["user_initvec"]);
+    if(user_initvec)
+    {
+        Rcpp::NumericVector v0 = params_rcpp["initvec"];
+        initvec = v0.begin();
+    }
+
     RealShift* op = get_real_shift_op_gen(A_mat_r, n, params_list_r, mattype);
-    Rcpp::RObject res = run_eigs_real_shift_gen(op, n, nev, ncv, rule, sigmar, maxitr, tol, retvec);
+    Rcpp::RObject res = run_eigs_real_shift_gen(op, n, nev, ncv, rule,
+                                                sigmar, maxitr, tol, retvec,
+                                                user_initvec, initvec);
 
     delete op;
 
@@ -169,8 +202,11 @@ RcppExport SEXP eigs_real_shift_gen(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar
 
 
 /************************ Complex shift mode ************************/
-Rcpp::RObject run_eigs_complex_shift_gen(ComplexShift* op, int n, int nev, int ncv, int rule,
-                                         double sigmar, double sigmai, int maxitr, double tol, bool retvec)
+Rcpp::RObject run_eigs_complex_shift_gen(
+    ComplexShift* op, int n, int nev, int ncv, int rule,
+    double sigmar, double sigmai, int maxitr, double tol, bool retvec,
+    bool user_initvec, const double* initvec
+)
 {
     Rcpp::RObject evals, evecs;
     int nconv = 0, niter = 0, nops = 0;
@@ -186,8 +222,10 @@ Rcpp::RObject run_eigs_complex_shift_gen(ComplexShift* op, int n, int nev, int n
     );
 }
 
-RcppExport SEXP eigs_complex_shift_gen(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
-                                       SEXP params_list_r, SEXP mattype_scalar_r)
+RcppExport SEXP eigs_complex_shift_gen(
+    SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
+    SEXP params_list_r, SEXP mattype_scalar_r
+)
 {
     BEGIN_RCPP
 
@@ -204,9 +242,18 @@ RcppExport SEXP eigs_complex_shift_gen(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_sca
     double sigmar = as<double>(params_rcpp["sigmar"]);
     double sigmai = as<double>(params_rcpp["sigmai"]);
 
+    const double* initvec = NULL;
+    bool user_initvec = as<bool>(params_rcpp["user_initvec"]);
+    if(user_initvec)
+    {
+        Rcpp::NumericVector v0 = params_rcpp["initvec"];
+        initvec = v0.begin();
+    }
+
     ComplexShift* op = get_complex_shift_op(A_mat_r, n, params_list_r, mattype);
     Rcpp::RObject res = run_eigs_complex_shift_gen(op, n, nev, ncv, rule, sigmar, sigmai,
-                                                   maxitr, tol, retvec);
+                                                   maxitr, tol, retvec,
+                                                   user_initvec, initvec);
 
     delete op;
 
@@ -232,7 +279,8 @@ void eigs_gen_c(
     Rcpp::List res;
     try {
         res = run_eigs_gen((MatProd*) &cmat_op, n, k, opts->ncv, opts->rule,
-                           opts->maxitr, opts->tol, opts->retvec != 0);
+                           opts->maxitr, opts->tol, opts->retvec != 0,
+                           false, NULL);
         *info = 0;
     } catch(...) {
         *info = 1;  // indicates error
@@ -278,14 +326,16 @@ void eigs_gen_shift_c(
             CRealShift cmat_op(op, n, data);
             res = run_eigs_real_shift_gen(
                       (RealShift*) &cmat_op, n, k, opts->ncv, opts->rule,
-                      sigmar, opts->maxitr, opts->tol, opts->retvec != 0
+                      sigmar, opts->maxitr, opts->tol, opts->retvec != 0,
+                      false, NULL
                   );
         }
         else {
             CComplexShift cmat_op(op, n, data);
             res = run_eigs_complex_shift_gen(
                       (ComplexShift*) &cmat_op, n, k, opts->ncv, opts->rule,
-                      sigmar, sigmai, opts->maxitr, opts->tol, opts->retvec != 0
+                      sigmar, sigmai, opts->maxitr, opts->tol, opts->retvec != 0,
+                      false, NULL
                   );
         }
 
