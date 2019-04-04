@@ -3,7 +3,7 @@
 ### Introduction
 
 **RSpectra** is an R interface to the
-[Spectra library](http://yixuan.cos.name/spectra/).
+[Spectra library](https://spectralib.org/).
 It is typically used to compute a few eigenvalues/vectors of an `n` by `n`
 matrix, e.g., the `k` largest eigen values, which
 is usually more efficient than `eigen()` if `k << n`.

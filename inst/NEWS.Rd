@@ -1,6 +1,16 @@
 \name{NEWS}
 \title{News for Package "RSpectra"}
 
+\section{Changes in RSpectra version 0.14-0}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item Updated Spectra to v0.8.0.
+      \item New parameter \code{opts$initvec} in \code{eigs()} and \code{eigs_sym()}
+            to allow users supplying the initial vector for the algorithm.
+    }
+  }
+}
+
 \section{Changes in RSpectra version 0.13-1}{
   \subsection{BUG FIXES}{
      \itemize{

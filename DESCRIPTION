@@ -1,8 +1,8 @@
 Package: RSpectra
 Type: Package
-Title: Solvers for Large-Scale Eigenvalue and SVD Problems
-Version: 0.13-1
-Date: 2018-05-22
+Title: Solvers for Large Scale Eigenvalue and SVD Problems
+Version: 0.14-0
+Date: 2019-04-03
 Authors@R: c(
     person("Yixuan", "Qiu", , "yixuan.qiu@cos.name", c("aut", "cre")),
     person("Jiali", "Mei", , "vermouthmjl@gmail.com", "aut",
@@ -34,4 +34,4 @@ Suggests:
     knitr, rmarkdown, prettydoc
 LinkingTo: Rcpp, RcppEigen (>= 0.3.2.2.0)
 VignetteBuilder: knitr, rmarkdown, prettydoc
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1

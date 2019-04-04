@@ -53,6 +53,7 @@ eigs_real_sym <- function(A, n, k, which, sigma, opts, mattype, extra_args = lis
                          tol = 1e-10,
                          maxitr = 1000,
                          retvec = TRUE,
+                         user_initvec = FALSE,
                          sigma = sigma)
 
     # Check the value of 'which'
@@ -73,6 +74,15 @@ eigs_real_sym <- function(A, n, k, which, sigma, opts, mattype, extra_args = lis
     # Check the value of 'ncv'
     if (spectra.param$ncv <= k | spectra.param$ncv > n)
         stop("'opts$ncv' must be > k and <= nrow(A)")
+
+    # Check the value of 'initvec'
+    if ("initvec" %in% names(spectra.param))
+    {
+        if(length(spectra.param$initvec) != n)
+            stop("'opt$initvec' must have length n")
+        spectra.param$initvec = as.numeric(spectra.param$initvec)
+        spectra.param$user_initvec = TRUE
+    }
 
     # Call the C++ function
     fun = switch(workmode,

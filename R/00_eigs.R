@@ -101,6 +101,9 @@
 ##' \item{\code{maxitr}}{Maximum number of iterations. Default is 1000.}
 ##' \item{\code{retvec}}{Whether to compute eigenvectors. If FALSE,
 ##'                      only calculate and return eigenvalues.}
+##' \item{\code{initvec}}{Initial vector of length \eqn{n} supplied to the
+##'                       Arnoldi/Lanczos iteration. It may speed up the convergence
+##'                       if \code{initvec} is close to an eigenvector of \eqn{A}.}
 ##' }
 ##'
 ##' @section Shift-And-Invert Mode:
