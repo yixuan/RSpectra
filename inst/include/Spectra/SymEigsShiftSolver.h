@@ -7,9 +7,11 @@
 #ifndef SYM_EIGS_SHIFT_SOLVER_H
 #define SYM_EIGS_SHIFT_SOLVER_H
 
-#include "SymEigsSolver.h"
-#include "MatOp/DenseSymShiftSolve.h"
+#include <Eigen/Core>
 
+#include "SymEigsBase.h"
+#include "Util/SelectionRule.h"
+#include "MatOp/DenseSymShiftSolve.h"
 
 namespace Spectra {
 
@@ -62,14 +64,15 @@ namespace Spectra {
 /// \tparam OpType        The name of the matrix operation class. Users could either
 ///                       use the wrapper classes such as DenseSymShiftSolve and
 ///                       SparseSymShiftSolve, or define their
-///                       own that impelemnts all the public member functions as in
+///                       own that implements all the public member functions as in
 ///                       DenseSymShiftSolve.
 ///
 /// Below is an example that illustrates the use of the shift-and-invert mode:
 ///
 /// \code{.cpp}
 /// #include <Eigen/Core>
-/// #include <SymEigsShiftSolver.h>  // Also includes <MatOp/DenseSymShiftSolve.h>
+/// #include <Spectra/SymEigsShiftSolver.h>
+/// // <Spectra/MatOp/DenseSymShiftSolve.h> is implicitly included
 /// #include <iostream>
 ///
 /// using namespace Spectra;
@@ -106,7 +109,7 @@ namespace Spectra {
 ///
 /// \code{.cpp}
 /// #include <Eigen/Core>
-/// #include <SymEigsShiftSolver.h>
+/// #include <Spectra/SymEigsShiftSolver.h>
 /// #include <iostream>
 ///
 /// using namespace Spectra;
@@ -153,45 +156,45 @@ namespace Spectra {
 template <typename Scalar = double,
           int SelectionRule = LARGEST_MAGN,
           typename OpType = DenseSymShiftSolve<double> >
-class SymEigsShiftSolver: public SymEigsSolver<Scalar, SelectionRule, OpType>
+class SymEigsShiftSolver: public SymEigsBase<Scalar, SelectionRule, OpType, IdentityBOp>
 {
 private:
     typedef Eigen::Array<Scalar, Eigen::Dynamic, 1> Array;
 
-    Scalar sigma;
+    const Scalar m_sigma;
 
-    // First transform back the ritz values, and then sort
+    // First transform back the Ritz values, and then sort
     void sort_ritzpair(int sort_rule)
     {
-        Array m_ritz_val_org = Scalar(1.0) / this->m_ritz_val.head(this->m_nev).array() + sigma;
+        Array m_ritz_val_org = Scalar(1.0) / this->m_ritz_val.head(this->m_nev).array() + m_sigma;
         this->m_ritz_val.head(this->m_nev) = m_ritz_val_org;
-        SymEigsSolver<Scalar, SelectionRule, OpType>::sort_ritzpair(sort_rule);
+        SymEigsBase<Scalar, SelectionRule, OpType, IdentityBOp>::sort_ritzpair(sort_rule);
     }
 
 public:
     ///
     /// Constructor to create a eigen solver object using the shift-and-invert mode.
     ///
-    /// \param op_    Pointer to the matrix operation object, which should implement
+    /// \param op     Pointer to the matrix operation object, which should implement
     ///               the shift-solve operation of \f$A\f$: calculating
     ///               \f$(A-\sigma I)^{-1}v\f$ for any vector \f$v\f$. Users could either
     ///               create the object from the wrapper class such as DenseSymShiftSolve, or
-    ///               define their own that impelemnts all the public member functions
+    ///               define their own that implements all the public member functions
     ///               as in DenseSymShiftSolve.
-    /// \param nev_   Number of eigenvalues requested. This should satisfy \f$1\le nev \le n-1\f$,
+    /// \param nev    Number of eigenvalues requested. This should satisfy \f$1\le nev \le n-1\f$,
     ///               where \f$n\f$ is the size of matrix.
-    /// \param ncv_   Parameter that controls the convergence speed of the algorithm.
+    /// \param ncv    Parameter that controls the convergence speed of the algorithm.
     ///               Typically a larger `ncv_` means faster convergence, but it may
     ///               also result in greater memory use and more matrix operations
     ///               in each iteration. This parameter must satisfy \f$nev < ncv \le n\f$,
     ///               and is advised to take \f$ncv \ge 2\cdot nev\f$.
-    /// \param sigma_ The value of the shift.
+    /// \param sigma  The value of the shift.
     ///
-    SymEigsShiftSolver(OpType* op_, int nev_, int ncv_, Scalar sigma_) :
-        SymEigsSolver<Scalar, SelectionRule, OpType>(op_, nev_, ncv_),
-        sigma(sigma_)
+    SymEigsShiftSolver(OpType* op, int nev, int ncv, Scalar sigma) :
+        SymEigsBase<Scalar, SelectionRule, OpType, IdentityBOp>(op, NULL, nev, ncv),
+        m_sigma(sigma)
     {
-        this->m_op->set_shift(sigma);
+        this->m_op->set_shift(m_sigma);
     }
 };
 

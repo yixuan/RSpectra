@@ -1,4 +1,4 @@
-// Copyright (C) 2016-2018 Yixuan Qiu <yixuan.qiu@cos.name>
+// Copyright (C) 2016-2019 Yixuan Qiu <yixuan.qiu@cos.name>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
@@ -9,7 +9,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-#include <Eigen/SparseCholesky>
+#include <Eigen/SparseLU>
 #include <stdexcept>
 
 namespace Spectra {
@@ -30,23 +30,24 @@ private:
     typedef Eigen::Map<const Vector> MapConstVec;
     typedef Eigen::Map<Vector> MapVec;
     typedef Eigen::SparseMatrix<Scalar, Flags, StorageIndex> SparseMatrix;
+    typedef const Eigen::Ref<const SparseMatrix> ConstGenericSparseMatrix;
 
-    const SparseMatrix& m_mat;
+    ConstGenericSparseMatrix m_mat;
     const int m_n;
-    Eigen::SimplicialLDLT<SparseMatrix, Uplo> m_solver;
+    Eigen::SparseLU<SparseMatrix> m_solver;
 
 public:
     ///
     /// Constructor to create the matrix operation object.
     ///
-    /// \param mat_ An **Eigen** sparse matrix object, whose type is
-    /// `Eigen::SparseMatrix<Scalar, ...>`.
+    /// \param mat An **Eigen** sparse matrix object, whose type can be
+    /// `Eigen::SparseMatrix<Scalar, ...>` or its mapped version
+    /// `Eigen::Map<Eigen::SparseMatrix<Scalar, ...> >`.
     ///
-    SparseSymShiftSolve(const SparseMatrix& mat_) :
-        m_mat(mat_),
-        m_n(mat_.rows())
+    SparseSymShiftSolve(ConstGenericSparseMatrix& mat) :
+        m_mat(mat), m_n(mat.rows())
     {
-        if(mat_.rows() != mat_.cols())
+        if(mat.rows() != mat.cols())
             throw std::invalid_argument("SparseSymShiftSolve: matrix must be square");
     }
 
@@ -64,8 +65,14 @@ public:
     ///
     void set_shift(Scalar sigma)
     {
-        m_solver.setShift(-sigma);
-        m_solver.compute(m_mat);
+        SparseMatrix mat = m_mat.template selfadjointView<Uplo>();
+        SparseMatrix identity(m_n, m_n);
+        identity.setIdentity();
+        mat = mat - sigma * identity;
+        m_solver.isSymmetric(true);
+        m_solver.compute(mat);
+        if(m_solver.info() != Eigen::Success)
+            throw std::invalid_argument("SparseSymShiftSolve: factorization failed with the given shift");
     }
 
     ///

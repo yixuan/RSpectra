@@ -15,7 +15,7 @@ namespace Spectra {
 
 
 ///
-/// \ingroup MatOp
+/// \ingroup Operators
 ///
 /// This class defines the matrix operation for generalized eigen solver in the
 /// Cholesky decomposition mode. It calculates \f$y=L^{-1}A(L')^{-1}x\f$ for any
@@ -39,11 +39,11 @@ public:
     ///
     /// Constructor to create the matrix operation object.
     ///
-    /// \param op_  Pointer to the \f$A\f$ matrix operation object.
-    /// \param Bop_ Pointer to the \f$B\f$ matrix operation object.
+    /// \param op   Pointer to the \f$A\f$ matrix operation object.
+    /// \param Bop  Pointer to the \f$B\f$ matrix operation object.
     ///
-    SymGEigsCholeskyOp(OpType& op_, BOpType& Bop_) :
-        m_op(op_), m_Bop(Bop_), m_cache(op_.rows())
+    SymGEigsCholeskyOp(OpType& op, BOpType& Bop) :
+        m_op(op), m_Bop(Bop), m_cache(op.rows())
     {}
 
     ///

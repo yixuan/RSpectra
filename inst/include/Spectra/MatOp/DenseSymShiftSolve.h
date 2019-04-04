@@ -1,4 +1,4 @@
-// Copyright (C) 2016-2018 Yixuan Qiu <yixuan.qiu@cos.name>
+// Copyright (C) 2016-2019 Yixuan Qiu <yixuan.qiu@cos.name>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
@@ -8,8 +8,10 @@
 #define DENSE_SYM_SHIFT_SOLVE_H
 
 #include <Eigen/Core>
-#include <Eigen/Cholesky>
 #include <stdexcept>
+
+#include "../LinAlg/BKLDLT.h"
+#include "../Util/CompInfo.h"
 
 namespace Spectra {
 
@@ -27,30 +29,27 @@ class DenseSymShiftSolve
 private:
     typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> Matrix;
     typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> Vector;
-    typedef Eigen::Map<const Matrix> MapConstMat;
     typedef Eigen::Map<const Vector> MapConstVec;
     typedef Eigen::Map<Vector> MapVec;
-
     typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
 
-    const MapConstMat m_mat;
+    ConstGenericMatrix m_mat;
     const int m_n;
-    Eigen::LDLT<Matrix, Uplo> m_solver;
+    BKLDLT<Scalar> m_solver;
 
 public:
     ///
     /// Constructor to create the matrix operation object.
     ///
-    /// \param mat_ An **Eigen** matrix object, whose type can be
+    /// \param mat An **Eigen** matrix object, whose type can be
     /// `Eigen::Matrix<Scalar, ...>` (e.g. `Eigen::MatrixXd` and
     /// `Eigen::MatrixXf`), or its mapped version
     /// (e.g. `Eigen::Map<Eigen::MatrixXd>`).
     ///
-    DenseSymShiftSolve(ConstGenericMatrix& mat_) :
-        m_mat(mat_.data(), mat_.rows(), mat_.cols()),
-        m_n(mat_.rows())
+    DenseSymShiftSolve(ConstGenericMatrix& mat) :
+        m_mat(mat), m_n(mat.rows())
     {
-        if(mat_.rows() != mat_.cols())
+        if(mat.rows() != mat.cols())
             throw std::invalid_argument("DenseSymShiftSolve: matrix must be square");
     }
 
@@ -68,7 +67,9 @@ public:
     ///
     void set_shift(Scalar sigma)
     {
-        m_solver.compute(m_mat - sigma * Matrix::Identity(m_n, m_n));
+        m_solver.compute(m_mat, Uplo, sigma);
+        if(m_solver.info() != SUCCESSFUL)
+            throw std::invalid_argument("DenseSymShiftSolve: factorization failed with the given shift");
     }
 
     ///
