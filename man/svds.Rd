@@ -22,8 +22,8 @@ svds(A, k, nu = k, nv = k, opts = list(), ...)
 
 \method{svds}{dsyMatrix}(A, k, nu = k, nv = k, opts = list(), ...)
 
-\method{svds}{function}(A, k, nu = k, nv = k, opts = list(), ..., Atrans,
-  dim, args = NULL)
+\method{svds}{function}(A, k, nu = k, nv = k, opts = list(), ...,
+  Atrans, dim, args = NULL)
 }
 \arguments{
 \item{A}{The matrix whose truncated SVD is to be computed.}
@@ -173,6 +173,6 @@ svds(Af, k, Atrans = Atf, dim = c(m, n), args = Asp1)
 \code{\link[RSpectra]{eigs}()}.
 }
 \author{
-Yixuan Qiu <\url{http://statr.me}>
+Yixuan Qiu <\url{https://statr.me}>
 }
 \keyword{array}

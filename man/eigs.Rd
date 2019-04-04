@@ -14,23 +14,23 @@
 \usage{
 eigs(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 
-\method{eigs}{matrix}(A, k, which = "LM", sigma = NULL, opts = list(),
-  ...)
+\method{eigs}{matrix}(A, k, which = "LM", sigma = NULL,
+  opts = list(), ...)
 
-\method{eigs}{dgeMatrix}(A, k, which = "LM", sigma = NULL, opts = list(),
-  ...)
+\method{eigs}{dgeMatrix}(A, k, which = "LM", sigma = NULL,
+  opts = list(), ...)
 
-\method{eigs}{dgCMatrix}(A, k, which = "LM", sigma = NULL, opts = list(),
-  ...)
+\method{eigs}{dgCMatrix}(A, k, which = "LM", sigma = NULL,
+  opts = list(), ...)
 
-\method{eigs}{dgRMatrix}(A, k, which = "LM", sigma = NULL, opts = list(),
-  ...)
+\method{eigs}{dgRMatrix}(A, k, which = "LM", sigma = NULL,
+  opts = list(), ...)
 
-\method{eigs}{dsyMatrix}(A, k, which = "LM", sigma = NULL, opts = list(),
-  ...)
+\method{eigs}{dsyMatrix}(A, k, which = "LM", sigma = NULL,
+  opts = list(), ...)
 
-\method{eigs}{function}(A, k, which = "LM", sigma = NULL, opts = list(),
-  ..., n = NULL, args = NULL)
+\method{eigs}{function}(A, k, which = "LM", sigma = NULL,
+  opts = list(), ..., n = NULL, args = NULL)
 
 eigs_sym(A, k, which = "LM", sigma = NULL, opts = list(),
    lower = TRUE, ...)
@@ -157,6 +157,9 @@ following parameters:
 \item{\code{maxitr}}{Maximum number of iterations. Default is 1000.}
 \item{\code{retvec}}{Whether to compute eigenvectors. If FALSE,
                      only calculate and return eigenvalues.}
+\item{\code{initvec}}{Initial vector of length \eqn{n} supplied to the
+                      Arnoldi/Lanczos iteration. It may speed up the convergence
+                      if \code{initvec} is close to an eigenvector of \eqn{A}.}
 }
 }
 \section{Shift-And-Invert Mode}{
@@ -244,7 +247,7 @@ eigs_sym(A5, k, sigma = 0)
          \code{\link[RSpectra]{svds}()}
 }
 \author{
-Yixuan Qiu \url{http://statr.me}
+Yixuan Qiu \url{https://statr.me}
 
         Jiali Mei \email{vermouthmjl@gmail.com}
 }
