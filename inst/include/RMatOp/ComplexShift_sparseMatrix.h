@@ -2,6 +2,7 @@
 #define COMPLEXSHIFT_SPARSEMATRIX_H
 
 #include <RcppEigen.h>
+#include "ComplexShift.h"
 
 template <int Storage>
 class ComplexShift_sparseMatrix: public ComplexShift

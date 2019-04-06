@@ -2,6 +2,7 @@
 #define REALSHIFT_SPARSEMATRIX_H
 
 #include <RcppEigen.h>
+#include "RealShift.h"
 
 template <int Storage>
 class RealShift_sparseMatrix: public RealShift
