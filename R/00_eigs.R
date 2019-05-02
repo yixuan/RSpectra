@@ -19,8 +19,12 @@
 ##'                          the \strong{Matrix} package.\cr
 ##'   \code{dgRMatrix}  \tab Row oriented sparse matrix, defined in
 ##'                          the \strong{Matrix} package.\cr
-##'   \code{dsyMatrix}  \tab Symmetrix matrix, defined in the \strong{Matrix}
+##'   \code{dsyMatrix}  \tab Symmetric matrix, defined in the \strong{Matrix}
 ##'                          package.\cr
+##'   \code{dsCMatrix}  \tab Symmetric column oriented sparse matrix, defined in
+##'                          the \strong{Matrix} package.\cr
+##'   \code{dsRMatrix}  \tab Symmetric row oriented sparse matrix, defined in
+##'                          the \strong{Matrix} package.\cr
 ##'   \code{function}   \tab Implicitly specify the matrix through a
 ##'                          function that has the effect of calculating
 ##'                          \eqn{f(x)=Ax}{f(x) = A * x}. See section
@@ -220,12 +224,13 @@ eigs.matrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 ##' @export
 eigs.dgeMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 {
-    if(isSymmetric(A) &
-           which %in% c("LM", "SM", "LR", "SR") &
-           (is.null(sigma) || Im(sigma) == 0))
-    {
-        if(which == "LR")  which = "LA"
-        if(which == "SR")  which = "SA"
+    if (is(A, 'symmetricMatrix') || (
+        isSymmetric(A) &&
+        which %in% c("LM", "SM", "LR", "SR") &&
+        (is.null(sigma) || Im(sigma) == 0)
+    )) {
+        if (which == "LR") which = "LA"
+        if (which == "SR") which = "SA"
         eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_dgeMatrix",
                       extra_args = list(use_lower = TRUE))
     } else {
@@ -237,12 +242,13 @@ eigs.dgeMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 ##' @export
 eigs.dgCMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 {
-    if(isSymmetric(A) &
-           which %in% c("LM", "SM", "LR", "SR") &
-           (is.null(sigma) || Im(sigma) == 0))
-    {
-        if(which == "LR")  which = "LA"
-        if(which == "SR")  which = "SA"
+    if (is(A, 'symmetricMatrix') || (
+        isSymmetric(A) &&
+        which %in% c("LM", "SM", "LR", "SR") &&
+        (is.null(sigma) || Im(sigma) == 0)
+    )) {
+        if (which == "LR") which = "LA"
+        if (which == "SR") which = "SA"
         eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "dsCMatrix",
                       extra_args = list(use_lower = TRUE))
     } else {

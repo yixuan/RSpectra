@@ -20,6 +20,10 @@
 ##'                          the \strong{Matrix} package.\cr
 ##'   \code{dsyMatrix}  \tab Symmetrix matrix, defined in the \strong{Matrix}
 ##'                          package.\cr
+##'   \code{dsCMatrix}  \tab Symmetric column oriented sparse matrix, defined in
+##'                          the \strong{Matrix} package.\cr
+##'   \code{dsRMatrix}  \tab Symmetric row oriented sparse matrix, defined in
+##'                          the \strong{Matrix} package.\cr
 ##'   \code{function}   \tab Implicitly specify the matrix through two
 ##'                          functions that calculate
 ##'                          \eqn{f(x)=Ax}{f(x) = A * x} and
@@ -165,13 +169,25 @@ svds.dgCMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 ##' @rdname svds
 ##' @export
 svds.dgRMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
-    svds_real_gen(A, k, nu, nv, opts, mattype = "dgRMatrix")
+{
+    fun = if(isSymmetric(A)) svds_real_sym else svds_real_gen
+    fun(A, k, nu, nv, opts, mattype = "dgRMatrix")
+}
 
 ##' @rdname svds
 ##' @export
 svds.dsyMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
-    svds_real_sym(A, k, nu, nv, opts, mattype = "dsyMatrix",
-                  extra_args = list(use_lower = (A@uplo == "L")))
+    svds_real_sym(A, k, nu, nv, opts, mattype = "dsyMatrix")
+
+##' @rdname svds
+##' @export
+svds.dsCMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
+    svds_real_sym(A, k, nu, nv, opts, mattype = "dsCMatrix")
+
+##' @rdname svds
+##' @export
+svds.dsRMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
+    svds_real_gen(A, k, nu, nv, opts, mattype = "dsRMatrix")
 
 ##' @rdname svds
 ##' @export
