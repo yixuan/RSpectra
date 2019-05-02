@@ -2,6 +2,7 @@
 #define MATPROD_SYM_SPARSEMATRIX_H
 
 #include <RcppEigen.h>
+#include <Rdefines.h>  // for R macros
 #include "MatProd.h"
 
 template <int Storage>
@@ -18,10 +19,10 @@ private:
     const char uplo;
 
 public:
-    MatProd_sym_sparseMatrix(SEXP mat_, const int nrow_, const char uplo_ = 'L') :
+    MatProd_sym_sparseMatrix(SEXP mat_, const int nrow_) :
         mat(Rcpp::as<MapSpMat>(mat_)),
         n(nrow_),
-        uplo(uplo_)
+        uplo(Rcpp::as<std::string>(GET_SLOT(mat_, Rf_install("uplo"))))
     {}
 
     int rows() const { return n; }
@@ -46,10 +47,10 @@ public:
 };
 
 // Operations on "dgCMatrix" class, defined in Matrix package
-typedef MatProd_sym_sparseMatrix<Eigen::ColMajor> MatProd_sym_dgCMatrix;
+typedef MatProd_sym_sparseMatrix<Eigen::ColMajor> MatProd_dsCMatrix;
 
 // Operations on "dgRMatrix" class, defined in Matrix package
-typedef MatProd_sym_sparseMatrix<Eigen::RowMajor> MatProd_sym_dgRMatrix;
+typedef MatProd_sym_sparseMatrix<Eigen::RowMajor> MatProd_dsRMatrix;
 
 
 #endif // MATPROD_SYM_SPARSEMATRIX_H

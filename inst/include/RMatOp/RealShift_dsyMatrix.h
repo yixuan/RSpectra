@@ -8,8 +8,8 @@
 class RealShift_dsyMatrix : public RealShift_sym_matrix
 {
 public:
-    RealShift_dsyMatrix(SEXP mat_, const int nrow_, const char uplo_ = 'L') :
-        RealShift_sym_matrix(GET_SLOT(mat_, Rf_install("x")), nrow_, uplo_)
+    RealShift_dsyMatrix(SEXP mat_, const int nrow_) :
+        RealShift_sym_matrix(GET_SLOT(mat_, Rf_install("x")), nrow_, Rcpp::as<std::string>(GET_SLOT(mat_, Rf_install("uplo"))))
     {}
 };
 
