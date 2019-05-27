@@ -27,9 +27,15 @@
 ##'                          \strong{Function Interface} for details.
 ##' }
 ##'
-##' Note that when \eqn{A} is symmetric,
+##' Note that when \eqn{A} is symmetric and positive semi-definite,
 ##' SVD reduces to eigen decomposition, so you may consider using
-##' \code{\link{eigs}()} instead.
+##' \code{\link{eigs}()} instead. When \eqn{A} is symmetric but
+##' not necessarily positive semi-definite, the left
+##' and right singular vectors are the same as the left and right
+##' eigenvectors, but the singular values and eigenvalues will
+##' not be the same. In particular, if \eqn{\lambda} is a negative
+##' eigenvalue of \eqn{A}, then \eqn{|\lambda|} will be the
+##' corresponding singular value.
 ##'
 ##' @param A The matrix whose truncated SVD is to be computed.
 ##' @param k Number of singular values requested.

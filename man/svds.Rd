@@ -93,9 +93,14 @@ Currently \code{svds()} supports matrices of the following classes:
                          \strong{Function Interface} for details.
 }
 
-Note that when \eqn{A} is symmetric,
+Note that when \eqn{A} is symmetric and positive semi-definite,
 SVD reduces to eigen decomposition, so you may consider using
-\code{\link{eigs}()} instead.
+\code{\link{eigs}()} instead. If \eqn{A} is symmetric, the left
+and right singular vectors are the same as the left and right
+eigenvectors, but the singular values and eigenvalues will
+not be the same. In particular, if \eqn{\lambda} is a negative
+eigenvalue of \eqn{A}, then \eqn{|\lambda|} will be the
+corresponding singular value.
 }
 \details{
 The \code{opts} argument is a list that can supply any of the
