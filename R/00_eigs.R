@@ -83,12 +83,12 @@
 ##'               and then from the low end.
 ##' }
 ##'
-##' \code{eigs()} with matrix type "matrix", "dgeMatrix", "dgCMatrix"
-##' and "dgRMatrix" can use "LM",
-##' "SM", "LR", "SR", "LI" and "SI".
+##' \code{eigs()} with matrix types "matrix", "dgeMatrix", "dgCMatrix"
+##' and "dgRMatrix" can use "LM", "SM", "LR", "SR", "LI" and "SI".
 ##'
-##' \code{eigs_sym()}, and \code{eigs()} with matrix type "dsyMatrix"
-##' can use "LM", "SM", "LA", "SA" and "BE".
+##' \code{eigs_sym()} with all supported matrix types,
+##' and \code{eigs()} with symmetric matrix types
+##' ("dsyMatrix", "dsCMatrix", and "dsRMatrix") can use "LM", "SM", "LA", "SA" and "BE".
 ##'
 ##' The \code{opts} argument is a list that can supply any of the
 ##' following parameters:
@@ -207,12 +207,16 @@ eigs <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 ##' @export
 eigs.matrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 {
-    if(isSymmetric(A) &
-           which %in% c("LM", "SM", "LR", "SR") &
-           (is.null(sigma) || Im(sigma) == 0))
-    {
+    if (is_sym(A) &&
+        which %in% c("LM", "SM", "LR", "SR") &&
+        (is.null(sigma) || Im(sigma) == 0)
+    ) {
         if(which == "LR")  which = "LA"
         if(which == "SR")  which = "SA"
+
+        ## `sym_matrix` is a "fake" matrix type we use in C++. It means we view
+        ## the matrix as a symmetric one. The extra argument `use_lower`
+        ## indicates whether it uses the lower or upper triangular part.
         eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_matrix",
                       extra_args = list(use_lower = TRUE))
     } else {
@@ -224,13 +228,17 @@ eigs.matrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 ##' @export
 eigs.dgeMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 {
-    if (is(A, 'symmetricMatrix') || (
-        isSymmetric(A) &&
+    if (is_sym(A) &&
         which %in% c("LM", "SM", "LR", "SR") &&
         (is.null(sigma) || Im(sigma) == 0)
-    )) {
+    ) {
         if (which == "LR") which = "LA"
         if (which == "SR") which = "SA"
+
+        ## `sym_dgeMatrix` is a "fake" matrix type we use in C++. It means the matrix
+        ## can be treated as a `dgeMatrix`, but we view it as a symmetric matrix.
+        ## The extra argument `use_lower` indicates whether it uses the lower or
+        ## upper triangular part.
         eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_dgeMatrix",
                       extra_args = list(use_lower = TRUE))
     } else {
@@ -242,14 +250,18 @@ eigs.dgeMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 ##' @export
 eigs.dgCMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 {
-    if (is(A, 'symmetricMatrix') || (
-        isSymmetric(A) &&
+    if (is_sym(A) &&
         which %in% c("LM", "SM", "LR", "SR") &&
         (is.null(sigma) || Im(sigma) == 0)
-    )) {
+    ) {
         if (which == "LR") which = "LA"
         if (which == "SR") which = "SA"
-        eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "dsCMatrix",
+
+        ## `sym_dgCMatrix` is a "fake" matrix type we use in C++. It means the matrix
+        ## can be treated as a `dgCMatrix`, but we view it as a symmetric matrix.
+        ## The extra argument `use_lower` indicates whether it uses the lower or
+        ## upper triangular part.
+        eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_dgCMatrix",
                       extra_args = list(use_lower = TRUE))
     } else {
         eigs_real_gen(A, nrow(A), k, which, sigma, opts, mattype = "dgCMatrix")
@@ -258,17 +270,47 @@ eigs.dgCMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 
 ##' @rdname eigs
 ##' @export
-eigs.dsCMatrix <- eigs.dgCMatrix
+eigs.dsCMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
+{
+    ## `dsCMatrix` is always symmetric.
+    ## It can be treated as a `sym_dgCMatrix`, but not vice versa, since
+    ## `dgCMatrix` does not have an `uplo` slot.
+    eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_dgCMatrix",
+                  extra_args = list(use_lower = (A@uplo == "L")))
+}
 
 ##' @rdname eigs
 ##' @export
-## isSymmetric() does not support dgRMatrix
 eigs.dgRMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
-    eigs_real_gen(A, nrow(A), k, which, sigma, opts, mattype = "dgRMatrix")
+{
+    if (is_sym(A) &&
+        which %in% c("LM", "SM", "LR", "SR") &&
+        (is.null(sigma) || Im(sigma) == 0)
+    ) {
+        if (which == "LR") which = "LA"
+        if (which == "SR") which = "SA"
+
+        ## `sym_dgRMatrix` is a "fake" matrix type we use in C++. It means the matrix
+        ## can be treated as a `dgRMatrix`, but we view it as a symmetric matrix.
+        ## The extra argument `use_lower` indicates whether it uses the lower or
+        ## upper triangular part.
+        eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_dgRMatrix",
+                      extra_args = list(use_lower = TRUE))
+    } else {
+        eigs_real_gen(A, nrow(A), k, which, sigma, opts, mattype = "dgRMatrix")
+    }
+}
 
 ##' @rdname eigs
 ##' @export
-eigs.dsRMatrix <- eigs.dgRMatrix
+eigs.dsRMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
+{
+    ## `dsRMatrix` is always symmetric.
+    ## It can be treated as a `sym_dgRMatrix`, but not vice versa, since
+    ## `dgRMatrix` does not have an `uplo` slot.
+    eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_dgRMatrix",
+                  extra_args = list(use_lower = (A@uplo == "L")))
+}
 
 ##' @rdname eigs
 ##' @export
@@ -309,14 +351,14 @@ eigs_sym.dgeMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(),
 eigs_sym.dgCMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(),
                                lower = TRUE, ...)
 {
-    eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "dsCMatrix",
+    eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_dgCMatrix",
                   extra_args = list(use_lower = as.logical(lower)))
 }
 
 eigs_sym.dgRMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(),
                                lower = TRUE, ...)
 {
-    eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "dsRMatrix",
+    eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_dgRMatrix",
                   extra_args = list(use_lower = as.logical(lower)))
 }
 
@@ -338,8 +380,8 @@ eigs_sym.function <- function(A, k, which = "LM", sigma = NULL, opts = list(),
 MAT_TYPE = c("matrix"    = 0L, "sym_matrix"    = 1L,
              "dgeMatrix" = 2L, "sym_dgeMatrix" = 3L,
              "dsyMatrix" = 4L,
-             "dgCMatrix" = 5L, "dsCMatrix" = 6L,
-             "dgRMatrix" = 7L, "dsRMatrix" = 8L,
+             "dgCMatrix" = 5L, "sym_dgCMatrix" = 6L,
+             "dgRMatrix" = 7L, "sym_dgRMatrix" = 8L,
              "function"  = 9L)
 # Solver types
 SOLVER_TYPE = c("regular" = 0L, "real_shift" = 1L, "complex_shift" = 2L)
