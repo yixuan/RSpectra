@@ -2,7 +2,6 @@
 #define REALSHIFT_SYM_SPARSEMATRIX_H
 
 #include <RcppEigen.h>
-#include <Rdefines.h>  // for R macros
 #include "RealShift.h"
 
 template <int Storage>
@@ -22,10 +21,10 @@ private:
     SpLDLSolver solver;
 
 public:
-    RealShift_sym_sparseMatrix(SEXP mat_, const int nrow_) :
+    RealShift_sym_sparseMatrix(SEXP mat_, const int nrow_, const char uplo_ = 'L') :
         mat(Rcpp::as<MapSpMat>(mat_)),
         n(nrow_),
-        uplo(Rcpp::as<std::string>(GET_SLOT(mat_, Rf_install("uplo"))))
+        uplo(uplo_)
     {}
 
     int rows() const { return n; }
@@ -51,10 +50,10 @@ public:
 };
 
 // Operations on "dgCMatrix" class, defined in Matrix package
-typedef RealShift_sym_sparseMatrix<Eigen::ColMajor> RealShift_dsCMatrix;
+typedef RealShift_sym_sparseMatrix<Eigen::ColMajor> RealShift_sym_dgCMatrix;
 
 // Operations on "dgRMatrix" class, defined in Matrix package
-typedef RealShift_sym_sparseMatrix<Eigen::RowMajor> RealShift_dsRMatrix;
+typedef RealShift_sym_sparseMatrix<Eigen::RowMajor> RealShift_sym_dgRMatrix;
 
 
 #endif // REALSHIFT_SYM_SPARSEMATRIX_H

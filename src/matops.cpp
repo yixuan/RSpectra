@@ -28,19 +28,28 @@ MatProd* get_mat_prod_op(SEXP mat, int nrow, int ncol, SEXP extra_arg, int mat_t
         }
         break;
     case DSYMATRIX:
-        op = new MatProd_dsyMatrix(mat, nrow);
+        {
+        bool use_lower = Rcpp::as<bool>(args["use_lower"]);
+        op = new MatProd_dsyMatrix(mat, nrow, use_lower ? 'L' : 'U');
+        }
         break;
     case DGCMATRIX:
         op = new MatProd_dgCMatrix(mat, nrow, ncol);
         break;
-    case DSCMATRIX:
-        op = new MatProd_dsCMatrix(mat, nrow);
+    case SYM_DGCMATRIX:
+        {
+        bool use_lower = Rcpp::as<bool>(args["use_lower"]);
+        op = new MatProd_sym_dgCMatrix(mat, nrow, use_lower ? 'L' : 'U');
+        }
         break;
     case DGRMATRIX:
         op = new MatProd_dgRMatrix(mat, nrow, ncol);
         break;
-    case DSRMATRIX:
-        op = new MatProd_dsRMatrix(mat, nrow);
+    case SYM_DGRMATRIX:
+        {
+        bool use_lower = Rcpp::as<bool>(args["use_lower"]);
+        op = new MatProd_sym_dgRMatrix(mat, nrow, use_lower ? 'L' : 'U');
+        }
         break;
     case FUNCTION:
         {
@@ -85,19 +94,28 @@ RealShift* get_real_shift_op_sym(SEXP mat, int n, SEXP extra_arg, int mat_type)
         }
         break;
     case DSYMATRIX:
-        op = new RealShift_dsyMatrix(mat, n);
+        {
+        bool use_lower = Rcpp::as<bool>(args["use_lower"]);
+        op = new RealShift_dsyMatrix(mat, n, use_lower ? 'L' : 'U');
+        }
         break;
     case DGCMATRIX:
         op = new RealShift_dgCMatrix(mat, n);
         break;
-    case DSCMATRIX:
-        op = new RealShift_dsCMatrix(mat, n);
+    case SYM_DGCMATRIX:
+        {
+        bool use_lower = Rcpp::as<bool>(args["use_lower"]);
+        op = new RealShift_sym_dgCMatrix(mat, n, use_lower ? 'L' : 'U');
+        }
         break;
     case DGRMATRIX:
         op = new RealShift_dgRMatrix(mat, n);
         break;
-    case DSRMATRIX:
-        op = new RealShift_dsRMatrix(mat, n);
+    case SYM_DGRMATRIX:
+        {
+        bool use_lower = Rcpp::as<bool>(args["use_lower"]);
+        op = new RealShift_sym_dgRMatrix(mat, n, use_lower ? 'L' : 'U');
+        }
         break;
     default:
         Rcpp::stop("unsupported matrix type");
