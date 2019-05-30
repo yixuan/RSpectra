@@ -9,7 +9,7 @@ class ComplexShift_sparseMatrix: public ComplexShift
 {
 private:
     typedef Eigen::SparseMatrix<double, Storage> SpMat;
-    typedef Eigen::MappedSparseMatrix<double, Storage> MapSpMat;
+    typedef Eigen::Map<SpMat> MapSpMat;
     typedef Eigen::Map<const Eigen::VectorXd> MapConstVec;
     typedef Eigen::Map<Eigen::VectorXd> MapVec;
 
