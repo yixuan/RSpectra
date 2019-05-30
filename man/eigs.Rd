@@ -4,9 +4,11 @@
 \alias{eigs}
 \alias{eigs.matrix}
 \alias{eigs.dgeMatrix}
-\alias{eigs.dgCMatrix}
-\alias{eigs.dgRMatrix}
 \alias{eigs.dsyMatrix}
+\alias{eigs.dgCMatrix}
+\alias{eigs.dsCMatrix}
+\alias{eigs.dgRMatrix}
+\alias{eigs.dsRMatrix}
 \alias{eigs.function}
 \alias{eigs_sym}
 \alias{eigs_sym.function}
@@ -20,13 +22,19 @@ eigs(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 \method{eigs}{dgeMatrix}(A, k, which = "LM", sigma = NULL,
   opts = list(), ...)
 
+\method{eigs}{dsyMatrix}(A, k, which = "LM", sigma = NULL,
+  opts = list(), ...)
+
 \method{eigs}{dgCMatrix}(A, k, which = "LM", sigma = NULL,
+  opts = list(), ...)
+
+\method{eigs}{dsCMatrix}(A, k, which = "LM", sigma = NULL,
   opts = list(), ...)
 
 \method{eigs}{dgRMatrix}(A, k, which = "LM", sigma = NULL,
   opts = list(), ...)
 
-\method{eigs}{dsyMatrix}(A, k, which = "LM", sigma = NULL,
+\method{eigs}{dsRMatrix}(A, k, which = "LM", sigma = NULL,
   opts = list(), ...)
 
 \method{eigs}{function}(A, k, which = "LM", sigma = NULL,
@@ -94,8 +102,12 @@ Currently \code{eigs()} supports matrices of the following classes:
                          the \strong{Matrix} package.\cr
   \code{dgRMatrix}  \tab Row oriented sparse matrix, defined in
                          the \strong{Matrix} package.\cr
-  \code{dsyMatrix}  \tab Symmetrix matrix, defined in the \strong{Matrix}
+  \code{dsyMatrix}  \tab Symmetric matrix, defined in the \strong{Matrix}
                          package.\cr
+  \code{dsCMatrix}  \tab Symmetric column oriented sparse matrix, defined in
+                         the \strong{Matrix} package.\cr
+  \code{dsRMatrix}  \tab Symmetric row oriented sparse matrix, defined in
+                         the \strong{Matrix} package.\cr
   \code{function}   \tab Implicitly specify the matrix through a
                          function that has the effect of calculating
                          \eqn{f(x)=Ax}{f(x) = A * x}. See section
@@ -135,12 +147,12 @@ Possible values are:
               and then from the low end.
 }
 
-\code{eigs()} with matrix type "matrix", "dgeMatrix", "dgCMatrix"
-and "dgRMatrix" can use "LM",
-"SM", "LR", "SR", "LI" and "SI".
+\code{eigs()} with matrix types "matrix", "dgeMatrix", "dgCMatrix"
+and "dgRMatrix" can use "LM", "SM", "LR", "SR", "LI" and "SI".
 
-\code{eigs_sym()}, and \code{eigs()} with matrix type "dsyMatrix"
-can use "LM", "SM", "LA", "SA" and "BE".
+\code{eigs_sym()} with all supported matrix types,
+and \code{eigs()} with symmetric matrix types
+("dsyMatrix", "dsCMatrix", and "dsRMatrix") can use "LM", "SM", "LA", "SA" and "BE".
 
 The \code{opts} argument is a list that can supply any of the
 following parameters:

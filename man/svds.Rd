@@ -7,6 +7,8 @@
 \alias{svds.dgCMatrix}
 \alias{svds.dgRMatrix}
 \alias{svds.dsyMatrix}
+\alias{svds.dsCMatrix}
+\alias{svds.dsRMatrix}
 \alias{svds.function}
 \title{Find the Largest k Singular Values/Vectors of a Matrix}
 \usage{
@@ -21,6 +23,10 @@ svds(A, k, nu = k, nv = k, opts = list(), ...)
 \method{svds}{dgRMatrix}(A, k, nu = k, nv = k, opts = list(), ...)
 
 \method{svds}{dsyMatrix}(A, k, nu = k, nv = k, opts = list(), ...)
+
+\method{svds}{dsCMatrix}(A, k, nu = k, nv = k, opts = list(), ...)
+
+\method{svds}{dsRMatrix}(A, k, nu = k, nv = k, opts = list(), ...)
 
 \method{svds}{function}(A, k, nu = k, nv = k, opts = list(), ...,
   Atrans, dim, args = NULL)
@@ -86,6 +92,10 @@ Currently \code{svds()} supports matrices of the following classes:
                          the \strong{Matrix} package.\cr
   \code{dsyMatrix}  \tab Symmetrix matrix, defined in the \strong{Matrix}
                          package.\cr
+  \code{dsCMatrix}  \tab Symmetric column oriented sparse matrix, defined in
+                         the \strong{Matrix} package.\cr
+  \code{dsRMatrix}  \tab Symmetric row oriented sparse matrix, defined in
+                         the \strong{Matrix} package.\cr
   \code{function}   \tab Implicitly specify the matrix through two
                          functions that calculate
                          \eqn{f(x)=Ax}{f(x) = A * x} and
@@ -95,7 +105,8 @@ Currently \code{svds()} supports matrices of the following classes:
 
 Note that when \eqn{A} is symmetric and positive semi-definite,
 SVD reduces to eigen decomposition, so you may consider using
-\code{\link{eigs}()} instead. If \eqn{A} is symmetric, the left
+\code{\link{eigs}()} instead. When \eqn{A} is symmetric but
+not necessarily positive semi-definite, the left
 and right singular vectors are the same as the left and right
 eigenvectors, but the singular values and eigenvalues will
 not be the same. In particular, if \eqn{\lambda} is a negative
