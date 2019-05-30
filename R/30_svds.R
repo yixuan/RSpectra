@@ -20,6 +20,10 @@
 ##'                          the \strong{Matrix} package.\cr
 ##'   \code{dsyMatrix}  \tab Symmetrix matrix, defined in the \strong{Matrix}
 ##'                          package.\cr
+##'   \code{dsCMatrix}  \tab Symmetric column oriented sparse matrix, defined in
+##'                          the \strong{Matrix} package.\cr
+##'   \code{dsRMatrix}  \tab Symmetric row oriented sparse matrix, defined in
+##'                          the \strong{Matrix} package.\cr
 ##'   \code{function}   \tab Implicitly specify the matrix through two
 ##'                          functions that calculate
 ##'                          \eqn{f(x)=Ax}{f(x) = A * x} and
@@ -148,7 +152,7 @@ svds <- function(A, k, nu = k, nv = k, opts = list(), ...)
 ##' @export
 svds.matrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 {
-    fun = if(isSymmetric(A)) svds_real_sym else svds_real_gen
+    fun = if(is_sym(A)) svds_real_sym else svds_real_gen
     fun(A, k, nu, nv, opts, mattype = "matrix")
 }
 
@@ -156,7 +160,7 @@ svds.matrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 ##' @export
 svds.dgeMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 {
-    fun = if(isSymmetric(A)) svds_real_sym else svds_real_gen
+    fun = if(is_sym(A)) svds_real_sym else svds_real_gen
     fun(A, k, nu, nv, opts, mattype = "dgeMatrix")
 }
 
@@ -164,19 +168,34 @@ svds.dgeMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 ##' @export
 svds.dgCMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 {
-    fun = if(isSymmetric(A)) svds_real_sym else svds_real_gen
+    fun = if(is_sym(A)) svds_real_sym else svds_real_gen
     fun(A, k, nu, nv, opts, mattype = "dgCMatrix")
 }
 
 ##' @rdname svds
 ##' @export
 svds.dgRMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
-    svds_real_gen(A, k, nu, nv, opts, mattype = "dgRMatrix")
+{
+    fun = if(is_sym(A)) svds_real_sym else svds_real_gen
+    fun(A, k, nu, nv, opts, mattype = "dgRMatrix")
+}
 
 ##' @rdname svds
 ##' @export
 svds.dsyMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
     svds_real_sym(A, k, nu, nv, opts, mattype = "dsyMatrix",
+                  extra_args = list(use_lower = (A@uplo == "L")))
+
+##' @rdname svds
+##' @export
+svds.dsCMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
+    svds_real_sym(A, k, nu, nv, opts, mattype = "sym_dgCMatrix",
+                  extra_args = list(use_lower = (A@uplo == "L")))
+
+##' @rdname svds
+##' @export
+svds.dsRMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
+    svds_real_sym(A, k, nu, nv, opts, mattype = "sym_dgRMatrix",
                   extra_args = list(use_lower = (A@uplo == "L")))
 
 ##' @rdname svds

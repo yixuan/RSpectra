@@ -41,6 +41,10 @@ SEXP svds_gen(
     SEXP params_list_r, SEXP mattype_scalar_r
 );
 
+SEXP is_sym_dgCMatrix(SEXP mat, SEXP tol);
+
+SEXP is_sym_dgRMatrix(SEXP mat, SEXP tol);
+
 static const R_CallMethodDef CallEntries[] = {
     {"eigs_sym",               (DL_FUNC) &eigs_sym,               5},
     {"eigs_shift_sym",         (DL_FUNC) &eigs_shift_sym,         5},
@@ -49,6 +53,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"eigs_complex_shift_gen", (DL_FUNC) &eigs_complex_shift_gen, 5},
     {"svds_sym",               (DL_FUNC) &svds_sym,               7},
     {"svds_gen",               (DL_FUNC) &svds_gen,               8},
+    {"is_sym_dgCMatrix",       (DL_FUNC) &is_sym_dgCMatrix,       2},
+    {"is_sym_dgRMatrix",       (DL_FUNC) &is_sym_dgRMatrix,       2},
     {NULL, NULL, 0}
 };
 
