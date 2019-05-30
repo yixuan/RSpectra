@@ -18,6 +18,8 @@
             and eigen decomposition for symmetric matrices, thanks to
             \href{https://github.com/alexpghayes}{@alexpghayes}
             (\href{https://github.com/yixuan/RSpectra/pull/17}{#17}).
+      \item (Internal) Replaced the deprecated \code{Eigen::MappedSparseMatrix}
+            class in the C++ code.
     }
   }
 }
