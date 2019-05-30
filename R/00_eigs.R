@@ -248,6 +248,12 @@ eigs.dgeMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 
 ##' @rdname eigs
 ##' @export
+eigs.dsyMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
+    eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "dsyMatrix",
+                  extra_args = list(use_lower = (A@uplo == "L")))
+
+##' @rdname eigs
+##' @export
 eigs.dgCMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 {
     if (is_sym(A) &&
@@ -311,11 +317,6 @@ eigs.dsRMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
     eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_dgRMatrix",
                   extra_args = list(use_lower = (A@uplo == "L")))
 }
-
-##' @rdname eigs
-##' @export
-eigs.dsyMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(), ...)
-    eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "dsyMatrix")
 
 ##' @rdname eigs
 ##' @export
