@@ -15,7 +15,10 @@ gen = list(x,
            as(x, "dgRMatrix"))
 gent = lapply(gen, t)
 # Symmetric matrices
-sym = list(as(crossprod(x), "dsyMatrix"))
+y = crossprod(x)
+sym = list(as(y, "dsyMatrix"),
+           as(y, "dsCMatrix"),
+           as(as(y, "dsCMatrix"), "dsRMatrix"))
 
 ## Test whether the calculated (d, u, v) are consistent with svd()
 ## Return the largest residual
@@ -34,7 +37,7 @@ svd_resid = function(res, svd0)
 # "True" values
 gen0 = svd(x)
 gen0t = svd(t(x))
-sym0 = svd(crossprod(x))
+sym0 = svd(y)
 
 ## Capture test result, including error and warning
 capture = function(expr, env)

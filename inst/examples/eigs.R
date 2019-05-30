@@ -13,8 +13,14 @@ gen = list(x,
            as(x, "dgCMatrix"),
            as(x, "dgRMatrix"))
 # Symmetric matrices
-sym1 = list(x + t(x))
-sym2 = list(as(x + t(x), "dsyMatrix"))
+y = x + t(x)
+sym1 = list(y,
+            as(y, "dgeMatrix"),
+            as(y, "dgCMatrix"),
+            as(y, "dgRMatrix"))
+sym2 = list(as(y, "dsyMatrix"),
+            as(y, "dsCMatrix"),
+            as(as(y, "dsCMatrix"), "dsRMatrix"))
 
 ## Test whether the calculated eigenvalues and eigenvectors satisfy
 ##                         A * x = lambda * x
