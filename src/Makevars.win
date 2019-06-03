@@ -1,5 +1,5 @@
 PKG_CPPFLAGS = -I../inst/include
-PKG_LIBS = $(BLAS_LIBS) $(FLIBS)
+PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 
 .PHONY: all clean
 
