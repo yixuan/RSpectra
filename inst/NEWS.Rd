@@ -4,6 +4,7 @@
 \section{Changes in RSpectra version 0.15-0}{
   \subsection{NEW FEATURES}{
     \itemize{
+      \item Updated Spectra to v0.8.1.
       \item Added support for new matrix types \strong{dsCMatrix} and
             \strong{dsRMatrix} to handle sparse and symmetric matrices,
             contributed by \href{https://github.com/flying-sheep}{@flying-sheep}
@@ -11,7 +12,6 @@
       \item \code{eigs()} now detects the symmetry of \strong{dgRMatrix} matrices.
     }
   }
-
   \subsection{BUG FIXES}{
     \itemize{
       \item Improved the documentation about the relationship between SVD
