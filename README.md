@@ -8,18 +8,20 @@ It is typically used to compute a few eigenvalues/vectors of an `n` by `n`
 matrix, e.g., the `k` largest eigen values, which
 is usually more efficient than `eigen()` if `k << n`.
 
-Currently this package provides function `eigs()` for eigenvalue/eigenvector
+Currently this package provides the function `eigs()` for eigenvalue/eigenvector
 problems, and `svds()` for truncated SVD. Different matrix types in R,
 including sparse matrices, are supported. Below is a list of implemented ones:
 
 - `matrix` (defined in base R)
 - `dgeMatrix` (defined in **Matrix** package, for general matrices)
-- `dsyMatrix` (defined in **Matrix** package, for symmetric matrices)
 - `dgCMatrix` (defined in **Matrix** package, for column oriented sparse matrices)
 - `dgRMatrix` (defined in **Matrix** package, for row oriented sparse matrices)
+- `dsyMatrix` (defined in **Matrix** package, for symmetric matrices)
+- `dsCMatrix` (defined in **Matrix** package, for symmetric column oriented sparse matrices)
+- `dsRMatrix` (defined in **Matrix** package, for symmetric row oriented sparse matrices)
 - `function` (implicitly specify the matrix by providing a function that calculates matrix product `A %*% x`)
 
-### Example
+### Examples
 
 We first generate some matrices:
 
