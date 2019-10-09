@@ -1,6 +1,6 @@
 import(Rcpp)
 importClassesFrom(Matrix, dgeMatrix, dgCMatrix, dgRMatrix, dsyMatrix)
-importMethodsFrom(Matrix, isSymmetric, dim, as.matrix, coerce)
+importMethodsFrom(Matrix, isSymmetric, dim, as.matrix, coerce, colMeans, colSums)
 
 S3method(eigs, matrix)
 S3method(eigs, dgeMatrix)
