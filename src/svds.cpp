@@ -92,6 +92,9 @@ RcppExport SEXP svds_gen(SEXP A_mat_r, SEXP m_scalar_r, SEXP n_scalar_r,
 {
     BEGIN_RCPP
 
+    typedef Eigen::Map<const Eigen::VectorXd> MapConstVec;
+    typedef Eigen::Map<Eigen::MatrixXd> MapMat;
+
     Rcpp::List params_svds(params_list_r);
 
     int m        = as<int>(m_scalar_r);
@@ -102,16 +105,23 @@ RcppExport SEXP svds_gen(SEXP A_mat_r, SEXP m_scalar_r, SEXP n_scalar_r,
     int ncv      = as<int>(params_svds["ncv"]);
     double tol   = as<double>(params_svds["tol"]);
     int maxitr   = as<int>(params_svds["maxitr"]);
+    bool center  = as<bool>(params_svds["center"]);
+    bool scale   = as<bool>(params_svds["scale"]);
     int mattype  = as<int>(mattype_scalar_r);
+
+    Rcpp::NumericVector ctr_vec = params_svds["ctr_vec"];
+    Rcpp::NumericVector scl_vec = params_svds["scl_vec"];
+    MapConstVec ctr_map(ctr_vec.begin(), n);
+    MapConstVec scl_map(scl_vec.begin(), n);
 
     // Operation for original matrix
     MatProd* op_orig = get_mat_prod_op(A_mat_r, m, n, params_list_r, mattype);
     // Operation for SVD
     MatProd* op;
     if(m > n)
-        op = new SVDTallOp(op_orig);
+        op = new SVDTallOp(op_orig, center, scale, ctr_map, scl_map);
     else
-        op = new SVDWideOp(op_orig);
+        op = new SVDWideOp(op_orig, center, scale, ctr_map, scl_map);
 
     SymEigsSolver<double, LARGEST_ALGE, MatProd> eigs(op, k, ncv);
     eigs.init();
@@ -127,6 +137,8 @@ RcppExport SEXP svds_gen(SEXP A_mat_r, SEXP m_scalar_r, SEXP n_scalar_r,
 
     Rcpp::NumericVector d(nconv);
     Rcpp::NumericMatrix u(m, nu), v(n, nv);
+    MapMat umap = as<MapMat>(u);
+    MapMat vmap = as<MapMat>(v);
     int nops = 0;
 
     // Copy evals to d and take the square root
@@ -143,21 +155,29 @@ RcppExport SEXP svds_gen(SEXP A_mat_r, SEXP m_scalar_r, SEXP n_scalar_r,
     // Calculate the other one
     if(m > n)
     {
-        // A = UDV', A'A = VD^2V', AV = UD, ui = A * vi / di
+        // B = (A - 1c')S, S = diag(1 / s)
+        // B = UDV', B'B = VD^2V', BV = UD, ui = B * vi / di
+        // B * x = A * (Sx) - (c'Sx) * 1
+        // B * vi / di = A * (vi / s / di) - c'(vi / s / di) * 1
         // evecs has already been copied to v, so we can overwrite evecs
         for(int i = 0; i < nu; i++)
         {
-            evecs.col(i) /= d[i];
+            evecs.col(i).array() /= (d[i] * scl_map).array();
             op_orig->perform_op(&evecs(0, i), &u(0, i));
+            umap.col(i).array() -= ctr_map.dot(evecs.col(i));
             nops++;
         }
     } else {
-        // A = UDV', AA' = UD^2U', A'U = VD, vi = A' * ui / di
+        // B = (A - 1c')S, S = diag(1 / s)
+        // B = UDV', BB' = UD^2U', B'U = VD, vi = B' * ui / di
+        // B' * x = S(A' * x) - S(c(1'x))
+        // B' * ui / di = (A' * (ui / di)) / s - 1'(ui / di) * c / s
         // evecs has already been copied to u, so we can overwrite evecs
         for(int i = 0; i < nv; i++)
         {
-            evecs.col(i) /= d[i];
             op_orig->perform_tprod(&evecs(0, i), &v(0, i));
+            vmap.col(i).array() -= evecs.col(i).sum() * ctr_map.array();
+            vmap.col(i).array() /= (d[i] * scl_map.array());
             nops++;
         }
     }
