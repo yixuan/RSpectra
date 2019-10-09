@@ -148,11 +148,25 @@
 svds <- function(A, k, nu = k, nv = k, opts = list(), ...)
     UseMethod("svds")
 
+
+
+## Use a symmetric solver if:
+## 1. A is symmetric
+## 2. center = FALSE, scale = FALSE (default) in opts
+use_sym_solver <- function(A, opts)
+{
+    if(isTRUE(opts$center) || is.numeric(opts$center) ||
+       isTRUE(opts$scale)  || is.numeric(opts$scale))
+        return(FALSE)
+
+    is_sym(A)
+}
+
 ##' @rdname svds
 ##' @export
 svds.matrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 {
-    fun = if(is_sym(A)) svds_real_sym else svds_real_gen
+    fun = if(use_sym_solver(A, opts)) svds_real_sym else svds_real_gen
     fun(A, k, nu, nv, opts, mattype = "matrix")
 }
 
@@ -160,7 +174,7 @@ svds.matrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 ##' @export
 svds.dgeMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 {
-    fun = if(is_sym(A)) svds_real_sym else svds_real_gen
+    fun = if(use_sym_solver(A, opts)) svds_real_sym else svds_real_gen
     fun(A, k, nu, nv, opts, mattype = "dgeMatrix")
 }
 
@@ -168,7 +182,7 @@ svds.dgeMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 ##' @export
 svds.dgCMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 {
-    fun = if(is_sym(A)) svds_real_sym else svds_real_gen
+    fun = if(use_sym_solver(A, opts)) svds_real_sym else svds_real_gen
     fun(A, k, nu, nv, opts, mattype = "dgCMatrix")
 }
 
@@ -176,33 +190,50 @@ svds.dgCMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 ##' @export
 svds.dgRMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
 {
-    fun = if(is_sym(A)) svds_real_sym else svds_real_gen
+    fun = if(use_sym_solver(A, opts)) svds_real_sym else svds_real_gen
     fun(A, k, nu, nv, opts, mattype = "dgRMatrix")
 }
 
 ##' @rdname svds
 ##' @export
 svds.dsyMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
-    svds_real_sym(A, k, nu, nv, opts, mattype = "dsyMatrix",
-                  extra_args = list(use_lower = (A@uplo == "L")))
+{
+    fun = if(use_sym_solver(A, opts)) svds_real_sym else svds_real_gen
+    fun(A, k, nu, nv, opts, mattype = "dsyMatrix",
+        extra_args = list(use_lower = (A@uplo == "L")))
+}
+
 
 ##' @rdname svds
 ##' @export
 svds.dsCMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
-    svds_real_sym(A, k, nu, nv, opts, mattype = "sym_dgCMatrix",
-                  extra_args = list(use_lower = (A@uplo == "L")))
+{
+    fun = if(use_sym_solver(A, opts)) svds_real_sym else svds_real_gen
+    fun(A, k, nu, nv, opts, mattype = "sym_dgCMatrix",
+        extra_args = list(use_lower = (A@uplo == "L")))
+}
 
 ##' @rdname svds
 ##' @export
 svds.dsRMatrix <- function(A, k, nu = k, nv = k, opts = list(), ...)
-    svds_real_sym(A, k, nu, nv, opts, mattype = "sym_dgRMatrix",
-                  extra_args = list(use_lower = (A@uplo == "L")))
+{
+    fun = if(use_sym_solver(A, opts)) svds_real_sym else svds_real_gen
+    fun(A, k, nu, nv, opts, mattype = "sym_dgRMatrix",
+        extra_args = list(use_lower = (A@uplo == "L")))
+}
 
 ##' @rdname svds
 ##' @export
 svds.function <- function(A, k, nu = k, nv = k, opts = list(), ...,
                           Atrans, dim, args = NULL)
+{
+    if(isTRUE(opts$center))
+        stop("opts$center must be FALSE or a vector when A is a function")
+    if(isTRUE(opts$scale))
+        stop("opts$scale must be FALSE or a vector when A is a function")
+
     svds_real_gen(A, k, nu, nv, opts, mattype = "function",
                   extra_args = list(Atrans   = Atrans,
                                     dim      = dim,
                                     fun_args = args))
+}

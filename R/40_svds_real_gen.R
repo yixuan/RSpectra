@@ -44,13 +44,48 @@ svds_real_gen <- function(A, k, nu, nv, opts, mattype, extra_args = list())
     # Arguments to be passed to Spectra
     spectra.param = list(ncv = min(wd, max(2 * k + 1, 20)),
                          tol = 1e-10,
-                         maxitr = 1000)
+                         maxitr = 1000,
+                         center = FALSE,
+                         scale = FALSE)
+    # By default center = FALSE and scale = FALSE
+    ctr = rep(0, n)
+    scl = rep(1, n)
+
+    # Update ctr and scl from opts
+    if (isTRUE(opts$center))
+    {
+        ctr = colMeans(A)
+    } else if (is.numeric(opts$center)) {
+        if (length(opts$center) != n)
+            stop("opts$center must be TRUE/FALSE or a vector of length n")
+
+        ctr = as.numeric(opts$center)
+        opts$center = TRUE
+    } else {
+        opts$center = FALSE
+    }
+
+    if (isTRUE(opts$scale))
+    {
+        sumx = colSums(A)
+        sumxx = colSums(A^2)
+        scl = sqrt(sumxx - 2 * sumx * ctr + m * ctr^2)
+    } else if (is.numeric(opts$scale)) {
+        if (length(opts$scale) != n)
+            stop("opts$scale must be TRUE/FALSE or a vector of length n")
+
+        scl = as.numeric(opts$scale)
+        opts$scale = TRUE
+    } else {
+        opts$scale = FALSE
+    }
 
     # Update parameters from 'opts' argument
     spectra.param[names(opts)] = opts
 
     # Any other arguments passed to C++ code
-    spectra.param = c(spectra.param, as.list(extra_args))
+    spectra.param = c(spectra.param, as.list(extra_args),
+                      list(ctr_vec = ctr, scl_vec = scl))
 
     # Check the value of 'ncv'
     if (spectra.param$ncv <= k | spectra.param$ncv > wd)
