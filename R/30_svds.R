@@ -72,6 +72,19 @@
 ##'                   Default is \code{min(p, max(2*k+1, 20))}.}
 ##' \item{\code{tol}}{Precision parameter. Default is 1e-10.}
 ##' \item{\code{maxitr}}{Maximum number of iterations. Default is 1000.}
+##' \item{\code{center}}{Either a logical value (\code{TRUE}/\code{FALSE}), or a numeric
+##'                      vector of length \eqn{n}. If a vector \eqn{c} is supplied, then
+##'                      SVD is computed on the matrix \eqn{A - 1c'}{A - 1 * c'},
+##'                      in an implicit way without actually forming this matrix.
+##'                      \code{center = TRUE} has the same effect as
+##'                      \code{center = colMeans(A)}. Default is \code{FALSE}.}
+##' \item{\code{scale}}{Either a logical value (\code{TRUE}/\code{FALSE}), or a numeric
+##'                     vector of length \eqn{n}. If a vector \eqn{s} is supplied, then
+##'                     SVD is computed on the matrix \eqn{(A - 1c')S}{(A - 1 * c')S},
+##'                     where \eqn{c} is the centering vector and \eqn{S = diag(1/s)}.
+##'                     If \code{scale = TRUE}, then the vector \eqn{s} is computed as
+##'                     the column norm of \eqn{A - 1c'}{A - 1 * c'}.
+##'                     Default is \code{FALSE}.}
 ##' }
 ##'
 ##' @section Function Interface:
@@ -94,6 +107,9 @@
 ##' arguments can be passed in through the
 ##' \code{args} parameter. In \code{svds()}, user should also provide
 ##' the dimension of the implicit matrix through the argument \code{dim}.
+##'
+##' The function interface does not support the \code{center} and \code{scale} parameters
+##' in \code{opts}.
 ##'
 ##' @return A list with the following components:
 ##' \item{d}{A vector of the computed singular values.}

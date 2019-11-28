@@ -52,6 +52,9 @@ svds_real_gen <- function(A, k, nu, nv, opts, mattype, extra_args = list())
     scl = rep(1, n)
 
     # Update ctr and scl from opts
+    # 1. If `center == TRUE`, then the centering vector is the column mean of A
+    # 2. If `center` is a vector, then use this vector to center A
+    # 3. In other cases, do not center A
     if (isTRUE(opts$center))
     {
         ctr = colMeans(A)
@@ -64,7 +67,11 @@ svds_real_gen <- function(A, k, nu, nv, opts, mattype, extra_args = list())
     } else {
         opts$center = FALSE
     }
-
+    # Scaling is always applied to vectors **after centering**
+    # 4. If `scale == TRUE`, then the scaling vector consists of the norms of column
+    #    vectors of A **after centering**
+    # 5. If `scale` is a vector, then use this vector to scale A
+    # 6. In other cases, do not scale A
     if (isTRUE(opts$scale))
     {
         sumx = colSums(A)
