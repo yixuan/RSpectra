@@ -16,35 +16,45 @@
 \usage{
 eigs(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 
-\method{eigs}{matrix}(A, k, which = "LM", sigma = NULL,
-  opts = list(), ...)
+\method{eigs}{matrix}(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 
-\method{eigs}{dgeMatrix}(A, k, which = "LM", sigma = NULL,
-  opts = list(), ...)
+\method{eigs}{dgeMatrix}(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 
-\method{eigs}{dsyMatrix}(A, k, which = "LM", sigma = NULL,
-  opts = list(), ...)
+\method{eigs}{dsyMatrix}(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 
-\method{eigs}{dgCMatrix}(A, k, which = "LM", sigma = NULL,
-  opts = list(), ...)
+\method{eigs}{dgCMatrix}(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 
-\method{eigs}{dsCMatrix}(A, k, which = "LM", sigma = NULL,
-  opts = list(), ...)
+\method{eigs}{dsCMatrix}(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 
-\method{eigs}{dgRMatrix}(A, k, which = "LM", sigma = NULL,
-  opts = list(), ...)
+\method{eigs}{dgRMatrix}(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 
-\method{eigs}{dsRMatrix}(A, k, which = "LM", sigma = NULL,
-  opts = list(), ...)
+\method{eigs}{dsRMatrix}(A, k, which = "LM", sigma = NULL, opts = list(), ...)
 
-\method{eigs}{function}(A, k, which = "LM", sigma = NULL,
-  opts = list(), ..., n = NULL, args = NULL)
+\method{eigs}{`function`}(
+  A,
+  k,
+  which = "LM",
+  sigma = NULL,
+  opts = list(),
+  ...,
+  n = NULL,
+  args = NULL
+)
 
 eigs_sym(A, k, which = "LM", sigma = NULL, opts = list(),
    lower = TRUE, ...)
 
-\method{eigs_sym}{function}(A, k, which = "LM", sigma = NULL,
-  opts = list(), lower = TRUE, ..., n = NULL, args = NULL)
+\method{eigs_sym}{`function`}(
+  A,
+  k,
+  which = "LM",
+  sigma = NULL,
+  opts = list(),
+  lower = TRUE,
+  ...,
+  n = NULL,
+  args = NULL
+)
 }
 \arguments{
 \item{A}{The matrix whose eigenvalues/vectors are to be computed.
