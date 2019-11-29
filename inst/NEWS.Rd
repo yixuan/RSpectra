@@ -1,6 +1,17 @@
 \name{NEWS}
 \title{News for Package "RSpectra"}
 
+\section{Changes in RSpectra version 0.16-0}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item \code{svds()} now supports implicit centering and scaling of the matrix
+            via the \code{center} and \code{scale} parameters in the \code{opts}
+            argument, suggested by \href{https://github.com/robmaz}{@robmaz}
+            (\href{https://github.com/yixuan/spectra/issues/73}{#73} of Spectra).
+    }
+  }
+}
+
 \section{Changes in RSpectra version 0.15-0}{
   \subsection{NEW FEATURES}{
     \itemize{
