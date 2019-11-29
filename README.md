@@ -1,4 +1,4 @@
-## Solvers for Large Scale Eigenvalue and SVD Problems
+## Solvers for Large Scale Eigenvalue and SVD Problems <img src="https://statr.me/images/sticker-rspectra.png" alt="RSpectra" height="150px" align="right" />
 
 ### Introduction
 
