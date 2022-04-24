@@ -128,7 +128,7 @@
 ##' in that \code{eigs()} is good at finding large
 ##' eigenvalues rather than small ones. More explanation of the
 ##' shift-and-invert mode can be found in the SciPy document,
-##' \url{https://docs.scipy.org/doc/scipy/reference/tutorial/arpack.html}.
+##' \url{https://docs.scipy.org/doc/scipy/tutorial/arpack.html}.
 ##'
 ##' @section Function Interface:
 ##' The matrix \eqn{A} can be specified through a function with
