@@ -1,6 +1,14 @@
 \name{NEWS}
 \title{News for Package "RSpectra"}
 
+\section{Changes in RSpectra version 0.16-2}{
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item Fixed C++20 compiler errors, thanks to Prof. Ripley.
+    }
+  }
+}
+
 \section{Changes in RSpectra version 0.16-1}{
   \subsection{BUG FIXES}{
     \itemize{
