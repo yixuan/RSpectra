@@ -3,6 +3,9 @@
 
 #include <RcppEigen.h>
 #include <R_ext/Lapack.h>
+#ifndef FCONE
+# define FCONE
+#endif
 #include "RealShift.h"
 
 class RealShift_sym_matrix: public RealShift
@@ -43,7 +46,7 @@ public:
         F77_CALL(dsytrf)(&uplo, &n,
                  fac.data(), &n,
                  perm.data(),
-                 &blocksize, &lwork, &info);
+                 &blocksize, &lwork, &info FCONE);
 
         if(info != 0)
             Rcpp::stop("RealShift_sym_matrix: factorization failed with the given shift");
@@ -56,7 +59,7 @@ public:
         F77_CALL(dsytrf)(&uplo, &n,
                  fac.data(), &n,
                  perm.data(),
-                 &work[0], &lwork, &info);
+                 &work[0], &lwork, &info FCONE);
 
         if(info != 0)
             Rcpp::stop("RealShift_sym_matrix: factorization failed with the given shift");
@@ -71,7 +74,7 @@ public:
         int info;
         F77_CALL(dsytrs)(&uplo, &n, &nrhs,
                  fac.data(), &n,
-                 perm.data(), y_out, &n, &info);
+                 perm.data(), y_out, &n, &info FCONE);
 
         if(info != 0)
             Rcpp::stop("RealShift_sym_matrix: input vector has illegal values");

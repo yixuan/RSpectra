@@ -3,6 +3,9 @@
 
 // #include <RcppEigen.h>
 #include <R_ext/BLAS.h>  // for BLAS and F77_CALL
+#ifndef FCONE
+# define FCONE
+#endif
 #include "MatProd.h"
 
 class MatProd_matrix: public MatProd
@@ -48,7 +51,7 @@ public:
         F77_CALL(dgemv)("N", &nrow, &ncol,
                         &BLAS_alpha, mat_ptr, &nrow,
                         x_in, &BLAS_one, &BLAS_zero,
-                        y_out, &BLAS_one);
+                        y_out, &BLAS_one FCONE);
     }
 
     void perform_tprod(const double* x_in, double* y_out)
@@ -61,7 +64,7 @@ public:
         F77_CALL(dgemv)("T", &nrow, &ncol,
                         &BLAS_alpha, mat_ptr, &nrow,
                         x_in, &BLAS_one, &BLAS_zero,
-                        y_out, &BLAS_one);
+                        y_out, &BLAS_one FCONE);
     }
 };
 
