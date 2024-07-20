@@ -3,6 +3,9 @@
 
 #include <Rcpp.h>
 #include <R_ext/BLAS.h>  // for BLAS and F77_CALL
+#ifndef FCONE
+# define FCONE
+#endif
 #include "MatProd.h"
 
 class MatProd_sym_matrix: public MatProd
@@ -34,7 +37,7 @@ public:
         F77_CALL(dsymv)(&uplo, &n,
                         &BLAS_alpha, mat_ptr, &n,
                         x_in, &BLAS_one, &BLAS_zero,
-                        y_out, &BLAS_one);
+                        y_out, &BLAS_one FCONE);
     }
 
     void perform_tprod(const double* x_in, double* y_out)
