@@ -29,14 +29,14 @@ public:
     int cols() const { return ncol; }
 
     // y_out = A * x_in
-    void perform_op(const double* x_in, double* y_out)
+    void perform_op(const double* x_in, double* y_out) const
     {
         MapConstVec x(x_in, ncol);
         MapVec y(y_out, nrow);
         y.noalias() = mat * x;
     }
 
-    void perform_tprod(const double* x_in, double* y_out)
+    void perform_tprod(const double* x_in, double* y_out) const
     {
         MapConstVec x(x_in, nrow);
         MapVec y(y_out, ncol);

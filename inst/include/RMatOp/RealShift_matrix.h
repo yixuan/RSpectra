@@ -32,7 +32,7 @@ public:
     }
 
     // y_out = inv(A - sigma * I) * x_in
-    void perform_op(const double* x_in, double* y_out)
+    void perform_op(const double* x_in, double* y_out) const
     {
         MapConstVec x(x_in, n);
         MapVec y(y_out, n);
