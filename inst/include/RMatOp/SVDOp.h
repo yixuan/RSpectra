@@ -12,18 +12,18 @@ private:
     typedef Eigen::Map<const Vector> MapConstVec;
     typedef Eigen::Map<Vector> MapVec;
 
-    MatProd*    op;
-    const int   nrow;
-    const int   ncol;
-    const int   dim;
+    MatProd*       op;
+    const int      nrow;
+    const int      ncol;
+    const int      dim;
 
-    const bool  center;
-    const bool  scale;
-    MapConstVec ctr_vec;
-    MapConstVec scl_vec;
+    const bool     center;
+    const bool     scale;
+    MapConstVec    ctr_vec;
+    MapConstVec    scl_vec;
 
-    Vector      workm;
-    Vector      workn;
+    mutable Vector workm;
+    mutable Vector workn;
 public:
     SVDTallOp(MatProd* op_, bool center_, bool scale_,
               const MapConstVec& ctr_vec_, const MapConstVec& scl_vec_) :
@@ -42,7 +42,7 @@ public:
     // B = (A - 1c')S, c = ctr_vec, S = diag(1 / scl_vec)
     // Bv = A * (Sv) - (c'Sv) * 1
     // B'v = S(A'v) - S((1'v)c)
-    void perform_op(const double* x_in, double* y_out)
+    void perform_op(const double* x_in, double* y_out) const
     {
         // No centering or scaling
         if(!(center || scale))
@@ -66,7 +66,7 @@ public:
         }
     }
 
-    void perform_tprod(const double* x_in, double* y_out)
+    void perform_tprod(const double* x_in, double* y_out) const
     {
         perform_op(x_in, y_out);
     }
@@ -79,18 +79,18 @@ private:
     typedef Eigen::Map<const Vector> MapConstVec;
     typedef Eigen::Map<Vector> MapVec;
 
-    MatProd*    op;
-    const int   nrow;
-    const int   ncol;
-    const int   dim;
+    MatProd*       op;
+    const int      nrow;
+    const int      ncol;
+    const int      dim;
 
-    const bool  center;
-    const bool  scale;
-    MapConstVec ctr_vec;
-    MapConstVec scl_vec;
+    const bool     center;
+    const bool     scale;
+    MapConstVec    ctr_vec;
+    MapConstVec    scl_vec;
 
-    Vector      workm;
-    Vector      workn;
+    mutable Vector workm;
+    mutable Vector workn;
 public:
     SVDWideOp(MatProd* op_, bool center_, bool scale_,
               const MapConstVec& ctr_vec_, const MapConstVec& scl_vec_) :
@@ -109,7 +109,7 @@ public:
     // B = (A - 1c')S, c = ctr_vec, S = diag(1 / scl_vec)
     // B'v = S(A'v) - S((1'v)c)
     // Bv = A * (Sv) - (c'Sv) * 1
-    void perform_op(const double* x_in, double* y_out)
+    void perform_op(const double* x_in, double* y_out) const
     {
         if(!(center || scale))
         {
@@ -130,7 +130,7 @@ public:
         }
     }
 
-    void perform_tprod(const double* x_in, double* y_out)
+    void perform_tprod(const double* x_in, double* y_out) const
     {
         perform_op(x_in, y_out);
     }

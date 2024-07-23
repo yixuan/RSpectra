@@ -1,11 +1,13 @@
+#define USE_SPECTRA_1YZ
+
 #include <RcppEigen.h>
 #include <SymEigs.h>
 #include "matops.h"
 
 using namespace Spectra;
 using Rcpp::as;
-typedef Eigen::Map<Eigen::MatrixXd> MapMat;
-typedef Eigen::Map<Eigen::VectorXd> MapVec;
+using MapMat = Eigen::Map<Eigen::MatrixXd>;
+using MapVec = Eigen::Map<Eigen::VectorXd>;
 
 RcppExport SEXP svds_sym(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
                          SEXP nu_scalar_r, SEXP nv_scalar_r,
@@ -26,9 +28,9 @@ RcppExport SEXP svds_sym(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
 
     MatProd* op = get_mat_prod_op(A_mat_r, n, n, params_list_r, mattype);
 
-    SymEigsSolver<double, LARGEST_MAGN, MatProd> eigs(op, k, ncv);
+    SymEigsSolver<MatProd> eigs(*op, k, ncv);
     eigs.init();
-    int nconv = eigs.compute(maxitr, tol);
+    int nconv = eigs.compute(SortRule::LargestMagn, maxitr, tol);
     if(nconv < k)
         Rcpp::warning("only %d singular values converged, less than k = %d", nconv, k);
 
@@ -123,9 +125,9 @@ RcppExport SEXP svds_gen(SEXP A_mat_r, SEXP m_scalar_r, SEXP n_scalar_r,
     else
         op = new SVDWideOp(op_orig, center, scale, ctr_map, scl_map);
 
-    SymEigsSolver<double, LARGEST_ALGE, MatProd> eigs(op, k, ncv);
+    SymEigsSolver<MatProd> eigs(*op, k, ncv);
     eigs.init();
-    int nconv = eigs.compute(maxitr, tol);
+    int nconv = eigs.compute(SortRule::LargestAlge, maxitr, tol);
     if(nconv < k)
         Rcpp::warning("only %d singular values converged, less than k = %d", nconv, k);
 

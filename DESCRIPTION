@@ -1,8 +1,8 @@
 Package: RSpectra
 Type: Package
 Title: Solvers for Large-Scale Eigenvalue and SVD Problems
-Version: 0.16-2
-Date: 2024-07-18
+Version: 0.17-0
+Date: 2024-07-20
 Authors@R: c(
     person("Yixuan", "Qiu", , "yixuan.qiu@cos.name", c("aut", "cre")),
     person("Jiali", "Mei", , "vermouthmjl@gmail.com", "aut",

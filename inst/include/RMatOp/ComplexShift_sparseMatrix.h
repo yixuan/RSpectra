@@ -19,10 +19,10 @@ private:
     typedef Eigen::SparseLU< Eigen::SparseMatrix<Complex, Eigen::ColMajor> > SpLUSolver;
 
     // Map to Eigen sparse matrix
-    MapSpMat      mat;
-    const int     n;
-    SpLUSolver    solver;
-    ComplexVector x_cache;
+    MapSpMat              mat;
+    const int             n;
+    SpLUSolver            solver;
+    mutable ComplexVector x_cache;
 
 public:
     ComplexShift_sparseMatrix(SEXP mat_, const int nrow_) :
@@ -49,7 +49,7 @@ public:
     }
 
     // y_out = inv(A - sigma * I) * x_in
-    void perform_op(const double* x_in, double* y_out)
+    void perform_op(const double* x_in, double* y_out) const
     {
         x_cache.real() = MapConstVec(x_in, n);
         MapVec y(y_out, n);

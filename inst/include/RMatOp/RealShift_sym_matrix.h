@@ -66,7 +66,7 @@ public:
     }
 
     // y_out = inv(A - sigma * I) * x_in
-    void perform_op(const double* x_in, double* y_out)
+    void perform_op(const double* x_in, double* y_out) const
     {
         std::copy(x_in, x_in + n, y_out);
 

@@ -30,7 +30,7 @@ public:
     int cols() const { return n; }
 
     // y_out = A * x_in
-    void perform_op(const double* x_in, double* y_out)
+    void perform_op(const double* x_in, double* y_out) const
     {
         MapConstVec x(x_in, n);
         MapVec y(y_out, n);
@@ -41,7 +41,7 @@ public:
             y.noalias() = mat.template selfadjointView<Eigen::Upper>() * x;
     }
 
-    void perform_tprod(const double* x_in, double* y_out)
+    void perform_tprod(const double* x_in, double* y_out) const
     {
         perform_op(x_in, y_out);
     }

@@ -1,3 +1,5 @@
+#define USE_SPECTRA_1YZ
+
 #include <RcppEigen.h>
 #include <GenEigs.h>
 #include <SpectraC.h>
@@ -7,74 +9,6 @@
 using namespace Spectra;
 using Rcpp::as;
 
-/************************ Macros to generate code ************************/
-
-#define EIG_COMMON_CODE                                                        \
-if(user_initvec)                                                               \
-    eigs.init(initvec);                                                        \
-else                                                                           \
-    eigs.init();                                                               \
-nconv = eigs.compute(maxitr, tol);                                             \
-if(nconv < nev)                                                                \
-    Rcpp::warning("only %d eigenvalue(s) converged, less than k = %d",         \
-                  nconv, nev);                                                 \
-evals = Rcpp::wrap(eigs.eigenvalues());                                        \
-if(retvec)                                                                     \
-    evecs = Rcpp::wrap(eigs.eigenvectors());                                   \
-else                                                                           \
-    evecs = R_NilValue;                                                        \
-niter = eigs.num_iterations();                                                 \
-nops = eigs.num_operations();
-
-
-
-#define EIG_CODE_REGULAR(RULE, OPTYPE)                                         \
-GenEigsSolver<double, RULE, OPTYPE> eigs(op, nev, ncv);                        \
-EIG_COMMON_CODE
-
-
-
-#define EIG_CODE_REAL_SHIFT(RULE, OPTYPE)                                      \
-GenEigsRealShiftSolver<double, RULE, OPTYPE> eigs(op, nev, ncv, sigmar);       \
-EIG_COMMON_CODE
-
-
-
-#define EIG_CODE_COMPLEX_SHIFT(RULE, OPTYPE)                                   \
-GenEigsComplexShiftSolver<double, RULE, OPTYPE> eigs(op, nev, ncv, sigmar, sigmai);      \
-EIG_COMMON_CODE
-
-
-
-#define EIG_CODE_GENERATOR(SOLVER, OPTYPE)                                     \
-switch(rule)                                                                   \
-{                                                                              \
-    case WHICH_LM :                                                            \
-        { EIG_CODE_ ## SOLVER(WHICH_LM, OPTYPE) }                              \
-        break;                                                                 \
-    case WHICH_LR :                                                            \
-        { EIG_CODE_ ## SOLVER(WHICH_LR, OPTYPE) }                              \
-        break;                                                                 \
-    case WHICH_LI :                                                            \
-        { EIG_CODE_ ## SOLVER(WHICH_LI, OPTYPE) }                              \
-        break;                                                                 \
-    case WHICH_SM :                                                            \
-        { EIG_CODE_ ## SOLVER(WHICH_SM, OPTYPE) }                              \
-        break;                                                                 \
-    case WHICH_SR :                                                            \
-        { EIG_CODE_ ## SOLVER(WHICH_SR, OPTYPE) }                              \
-        break;                                                                 \
-    case WHICH_SI :                                                            \
-        { EIG_CODE_ ## SOLVER(WHICH_SI, OPTYPE) }                              \
-        break;                                                                 \
-    default:                                                                   \
-        Rcpp::stop("unsupported selection rule");                              \
-}
-
-/************************ Macros to generate code ************************/
-
-
-
 /************************ Regular mode ************************/
 Rcpp::RObject run_eigs_gen(
     MatProd* op, int n, int nev, int ncv, int rule,
@@ -83,9 +17,23 @@ Rcpp::RObject run_eigs_gen(
 )
 {
     Rcpp::RObject evals, evecs;
-    int nconv = 0, niter = 0, nops = 0;
 
-    EIG_CODE_GENERATOR(REGULAR, MatProd)
+    GenEigsSolver<MatProd> eigs(*op, nev, ncv);
+    if(user_initvec)
+        eigs.init(initvec);
+    else
+        eigs.init();
+    int nconv = eigs.compute(static_cast<SortRule>(rule), maxitr, tol);
+    if(nconv < nev)
+        Rcpp::warning("only %d eigenvalue(s) converged, less than k = %d",
+                      nconv, nev);
+    evals = Rcpp::wrap(eigs.eigenvalues());
+    if(retvec)
+        evecs = Rcpp::wrap(eigs.eigenvectors());
+    else
+        evecs = R_NilValue;
+    int niter = eigs.num_iterations();
+    int nops = eigs.num_operations();
 
     return Rcpp::List::create(
         Rcpp::Named("values")  = evals,
@@ -146,9 +94,23 @@ Rcpp::RObject run_eigs_real_shift_gen(
 )
 {
     Rcpp::RObject evals, evecs;
-    int nconv = 0, niter = 0, nops = 0;
 
-    EIG_CODE_GENERATOR(REAL_SHIFT, RealShift)
+    GenEigsRealShiftSolver<RealShift> eigs(*op, nev, ncv, sigmar);
+    if(user_initvec)
+        eigs.init(initvec);
+    else
+        eigs.init();
+    int nconv = eigs.compute(static_cast<SortRule>(rule), maxitr, tol);
+    if(nconv < nev)
+        Rcpp::warning("only %d eigenvalue(s) converged, less than k = %d",
+                      nconv, nev);
+    evals = Rcpp::wrap(eigs.eigenvalues());
+    if(retvec)
+        evecs = Rcpp::wrap(eigs.eigenvectors());
+    else
+        evecs = R_NilValue;
+    int niter = eigs.num_iterations();
+    int nops = eigs.num_operations();
 
     return Rcpp::List::create(
         Rcpp::Named("values")  = evals,
@@ -209,9 +171,23 @@ Rcpp::RObject run_eigs_complex_shift_gen(
 )
 {
     Rcpp::RObject evals, evecs;
-    int nconv = 0, niter = 0, nops = 0;
 
-    EIG_CODE_GENERATOR(COMPLEX_SHIFT, ComplexShift)
+    GenEigsComplexShiftSolver<ComplexShift> eigs(*op, nev, ncv, sigmar, sigmai);
+    if(user_initvec)
+        eigs.init(initvec);
+    else
+        eigs.init();
+    int nconv = eigs.compute(static_cast<SortRule>(rule), maxitr, tol);
+    if(nconv < nev)
+        Rcpp::warning("only %d eigenvalue(s) converged, less than k = %d",
+                      nconv, nev);
+    evals = Rcpp::wrap(eigs.eigenvalues());
+    if(retvec)
+        evecs = Rcpp::wrap(eigs.eigenvectors());
+    else
+        evecs = R_NilValue;
+    int niter = eigs.num_iterations();
+    int nops = eigs.num_operations();
 
     return Rcpp::List::create(
         Rcpp::Named("values")  = evals,

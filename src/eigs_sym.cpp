@@ -1,3 +1,5 @@
+#define USE_SPECTRA_1YZ
+
 #include <RcppEigen.h>
 #include <SymEigs.h>
 #include <SpectraC.h>
@@ -6,71 +8,7 @@
 
 using namespace Spectra;
 using Rcpp::as;
-typedef Eigen::Map<Eigen::MatrixXd> MapMat;
-
-/************************ Macros to generate code ************************/
-
-#define EIG_COMMON_CODE                                                        \
-if(user_initvec)                                                               \
-    eigs.init(initvec);                                                        \
-else                                                                           \
-    eigs.init();                                                               \
-nconv = eigs.compute(maxitr, tol);                                             \
-if(nconv < nev)                                                                \
-    Rcpp::warning("only %d eigenvalue(s) converged, less than k = %d",         \
-                  nconv, nev);                                                 \
-evals = Rcpp::wrap(eigs.eigenvalues());                                        \
-if(retvec)                                                                     \
-{                                                                              \
-    Rcpp::NumericMatrix evecs_ret(n, nconv);                                   \
-    MapMat m(evecs_ret.begin(), n, nconv);                                     \
-    m.noalias() = eigs.eigenvectors();                                         \
-    evecs = evecs_ret;                                                         \
-} else {                                                                       \
-    evecs = R_NilValue;                                                        \
-}                                                                              \
-niter = eigs.num_iterations();                                                 \
-nops = eigs.num_operations();
-
-
-
-#define EIG_CODE_REGULAR(RULE, OPTYPE)                                         \
-SymEigsSolver<double, RULE, OPTYPE> eigs(op, nev, ncv);                        \
-EIG_COMMON_CODE
-
-
-
-#define EIG_CODE_REAL_SHIFT(RULE, OPTYPE)                                      \
-SymEigsShiftSolver<double, RULE, OPTYPE> eigs(op, nev, ncv, sigma);            \
-EIG_COMMON_CODE
-
-
-
-#define EIG_CODE_GENERATOR(SOLVER, OPTYPE)                                     \
-switch(rule)                                                                   \
-{                                                                              \
-    case WHICH_LM :                                                            \
-        { EIG_CODE_ ## SOLVER(WHICH_LM, OPTYPE) }                              \
-        break;                                                                 \
-    case WHICH_LA :                                                            \
-        { EIG_CODE_ ## SOLVER(WHICH_LA, OPTYPE) }                              \
-        break;                                                                 \
-    case WHICH_SM :                                                            \
-        { EIG_CODE_ ## SOLVER(WHICH_SM, OPTYPE) }                              \
-        break;                                                                 \
-    case WHICH_SA :                                                            \
-        { EIG_CODE_ ## SOLVER(WHICH_SA, OPTYPE) }                              \
-        break;                                                                 \
-    case WHICH_BE :                                                            \
-        { EIG_CODE_ ## SOLVER(WHICH_BE, OPTYPE) }                              \
-        break;                                                                 \
-    default:                                                                   \
-        Rcpp::stop("unsupported selection rule");                              \
-}
-
-/************************ Macros to generate code ************************/
-
-
+using MapMat = Eigen::Map<Eigen::MatrixXd>;
 
 /************************ Regular mode ************************/
 Rcpp::RObject run_eigs_sym(
@@ -80,9 +18,28 @@ Rcpp::RObject run_eigs_sym(
 )
 {
     Rcpp::RObject evals, evecs;
-    int nconv = 0, niter = 0, nops = 0;
 
-    EIG_CODE_GENERATOR(REGULAR, MatProd)
+    SymEigsSolver<MatProd> eigs(*op, nev, ncv);
+    if(user_initvec)
+        eigs.init(initvec);
+    else
+        eigs.init();
+    int nconv = eigs.compute(static_cast<SortRule>(rule), maxitr, tol);
+    if(nconv < nev)
+        Rcpp::warning("only %d eigenvalue(s) converged, less than k = %d",
+                      nconv, nev);
+    evals = Rcpp::wrap(eigs.eigenvalues());
+    if(retvec)
+    {
+        Rcpp::NumericMatrix evecs_ret(n, nconv);
+        MapMat m(evecs_ret.begin(), n, nconv);
+        m.noalias() = eigs.eigenvectors();
+        evecs = evecs_ret;
+    } else {
+        evecs = R_NilValue;
+    }
+    int niter = eigs.num_iterations();
+    int nops = eigs.num_operations();
 
     return Rcpp::List::create(
         Rcpp::Named("values")  = evals,
@@ -92,8 +49,6 @@ Rcpp::RObject run_eigs_sym(
         Rcpp::Named("nops")    = nops
     );
 }
-
-
 
 RcppExport SEXP eigs_sym(
     SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
@@ -144,9 +99,28 @@ Rcpp::RObject run_eigs_shift_sym(
 )
 {
     Rcpp::RObject evals, evecs;
-    int nconv = 0, niter = 0, nops = 0;
 
-    EIG_CODE_GENERATOR(REAL_SHIFT, RealShift)
+    SymEigsShiftSolver<RealShift> eigs(*op, nev, ncv, sigma);
+    if(user_initvec)
+        eigs.init(initvec);
+    else
+        eigs.init();
+    int nconv = eigs.compute(static_cast<SortRule>(rule), maxitr, tol);
+    if(nconv < nev)
+        Rcpp::warning("only %d eigenvalue(s) converged, less than k = %d",
+                      nconv, nev);
+    evals = Rcpp::wrap(eigs.eigenvalues());
+    if(retvec)
+    {
+        Rcpp::NumericMatrix evecs_ret(n, nconv);
+        MapMat m(evecs_ret.begin(), n, nconv);
+        m.noalias() = eigs.eigenvectors();
+        evecs = evecs_ret;
+    } else {
+        evecs = R_NilValue;
+    }
+    int niter = eigs.num_iterations();
+    int nops = eigs.num_operations();
 
     return Rcpp::List::create(
         Rcpp::Named("values")  = evals,

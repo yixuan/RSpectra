@@ -41,7 +41,7 @@ public:
     int cols() const { return ncol; }
 
     // y_out = A * x_in
-    void perform_op(const double* x_in, double* y_out)
+    void perform_op(const double* x_in, double* y_out) const
     {
 /*
         MapVec x(x_in, ncol);
@@ -54,7 +54,7 @@ public:
                         y_out, &BLAS_one FCONE);
     }
 
-    void perform_tprod(const double* x_in, double* y_out)
+    void perform_tprod(const double* x_in, double* y_out) const
     {
 /*
         MapVec x(x_in, nrow);

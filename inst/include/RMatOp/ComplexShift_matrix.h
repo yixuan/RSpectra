@@ -17,10 +17,10 @@ private:
     typedef Eigen::VectorXcd ComplexVector;
     typedef Eigen::PartialPivLU<ComplexMatrix> ComplexSolver;
 
-    MapConstMat   mat;
-    const int     n;
-    ComplexSolver solver;
-    ComplexVector x_cache;
+    MapConstMat           mat;
+    const int             n;
+    ComplexSolver         solver;
+    mutable ComplexVector x_cache;
 
 public:
     ComplexShift_matrix(SEXP mat_, const int nrow_) :
@@ -41,7 +41,7 @@ public:
     }
 
     // y_out = inv(A - sigma * I) * x_in
-    void perform_op(const double* x_in, double* y_out)
+    void perform_op(const double* x_in, double* y_out) const
     {
         x_cache.real() = MapConstVec(x_in, n);
         MapVec y(y_out, n);
