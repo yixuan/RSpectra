@@ -2,7 +2,7 @@ Package: RSpectra
 Type: Package
 Title: Solvers for Large-Scale Eigenvalue and SVD Problems
 Version: 0.17-0
-Date: 2024-07-20
+Date: 2025-08-22
 Authors@R: c(
     person("Yixuan", "Qiu", , "yixuan.qiu@cos.name", c("aut", "cre")),
     person("Jiali", "Mei", , "vermouthmjl@gmail.com", "aut",
@@ -26,12 +26,13 @@ License: MPL (>= 2)
 URL: https://github.com/yixuan/RSpectra
 BugReports: https://github.com/yixuan/RSpectra/issues
 Depends:
-    R (>= 3.0.2)
+    R (>= 4.0.0)
 Imports:
-    Matrix (>= 1.1-0),
-    Rcpp (>= 0.11.5)
+    Matrix (>= 1.6-5),
+    Rcpp (>= 1.0.12)
 Suggests:
     knitr, rmarkdown, prettydoc
-LinkingTo: Rcpp, RcppEigen (>= 0.3.3.3.0)
+LinkingTo: Rcpp, RcppEigen (>= 0.3.4.0.0)
 VignetteBuilder: knitr, rmarkdown
-RoxygenNote: 7.1.2
+Encoding: UTF-8
+RoxygenNote: 7.3.2

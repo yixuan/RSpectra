@@ -1,6 +1,15 @@
 \name{NEWS}
 \title{News for Package "RSpectra"}
 
+\section{Changes in RSpectra version 0.17-0}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item Updated Spectra to v1.2.0.
+      \item Updated all internal code to be compatible with Spectra v1.2.0.
+    }
+  }
+}
+
 \section{Changes in RSpectra version 0.16-2}{
   \subsection{BUG FIXES}{
     \itemize{
