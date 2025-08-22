@@ -1,4 +1,4 @@
-// Copyright (C) 2016-2023 Yixuan Qiu <yixuan.qiu@cos.name>
+// Copyright (C) 2016-2025 Yixuan Qiu <yixuan.qiu@cos.name>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
@@ -18,8 +18,9 @@ namespace Spectra {
 ///
 /// \ingroup EigenSolver
 ///
-/// This class implements the eigen solver for general real matrices, i.e.,
-/// to solve \f$Ax=\lambda x\f$ for a possibly non-symmetric \f$A\f$ matrix.
+/// This class implements the eigen solver for general matrices, i.e.,
+/// to solve \f$Ax=\lambda x\f$ for a possibly non-symmetric (for real-valued matrices)
+/// or non-Hermitian (for complex-valued matrices) \f$A\f$ matrix.
 ///
 /// Most of the background information documented in the SymEigsSolver class
 /// also applies to the GenEigsSolver class here, except that the eigenvalues
@@ -115,6 +116,45 @@ namespace Spectra {
 ///     return 0;
 /// }
 /// \endcode
+///
+/// GenEigsSolver also supports complex-valued matrices:
+///
+/// \code{.cpp}
+/// #include <Eigen/Core>
+/// #include <Spectra/GenEigsSolver.h>
+/// // <Spectra/MatOp/DenseGenMatProd.h> is implicitly included
+/// #include <iostream>
+///
+/// using namespace Spectra;
+///
+/// int main()
+/// {
+///     // We are going to calculate the eigenvalues of M
+///     Eigen::MatrixXcd M = Eigen::MatrixXcd::Random(10, 10);
+///
+///     // Construct matrix operation object using the wrapper class
+///     using OpType = DenseGenMatProd<std::complex<double>>;
+///     OpType op(M);
+///
+///     // Construct eigen solver object, requesting the largest
+///     // (in magnitude, or norm) three eigenvalues
+///     GenEigsSolver<OpType> eigs(op, 3, 6);
+///
+///     // Initialize and compute
+///     eigs.init();
+///     int nconv = eigs.compute(SortRule::LargestMagn);
+///
+///     // Retrieve results
+///     Eigen::VectorXcd evalues;
+///     if (eigs.info() == CompInfo::Successful)
+///         evalues = eigs.eigenvalues();
+///
+///     std::cout << "Eigenvalues found:\n" << evalues << std::endl;
+///
+///     return 0;
+/// }
+/// \endcode
+///
 template <typename OpType = DenseGenMatProd<double>>
 class GenEigsSolver : public GenEigsBase<OpType, IdentityBOp>
 {

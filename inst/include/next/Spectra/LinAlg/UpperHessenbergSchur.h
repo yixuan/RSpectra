@@ -2,7 +2,7 @@
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2010,2012 Jitse Niesen <jitse@maths.leeds.ac.uk>
-// Copyright (C) 2021-2023 Yixuan Qiu <yixuan.qiu@cos.name>
+// Copyright (C) 2021-2025 Yixuan Qiu <yixuan.qiu@cos.name>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
@@ -14,12 +14,18 @@
 #include <Eigen/Core>
 #include <Eigen/Jacobi>
 #include <Eigen/Householder>
-#include <stdexcept>
+#include <cmath>      // std::sqrt, std::abs
+#include <algorithm>  // std::min
+#include <stdexcept>  // std::invalid_argument, std::logic_error, std::runtime_error
 
 #include "../Util/TypeTraits.h"
 
 namespace Spectra {
 
+// Modified from Eigen/src/Eigenvaleus/RealSchur.h
+//
+// The main change in this version is to assume that the input matrix
+// is upper Hessenberg, and we use SIMD operations to optimize some intensive computation
 template <typename Scalar = double>
 class UpperHessenbergSchur
 {

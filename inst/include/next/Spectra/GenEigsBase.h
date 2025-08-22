@@ -1,4 +1,4 @@
-// Copyright (C) 2018-2023 Yixuan Qiu <yixuan.qiu@cos.name>
+// Copyright (C) 2018-2025 Yixuan Qiu <yixuan.qiu@cos.name>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
@@ -11,7 +11,7 @@
 #include <vector>     // std::vector
 #include <cmath>      // std::abs, std::pow, std::sqrt
 #include <algorithm>  // std::min, std::copy
-#include <complex>    // std::complex, std::conj, std::norm, std::abs
+#include <complex>    // std::complex, std::norm, std::abs
 #include <stdexcept>  // std::invalid_argument
 
 #include "Util/Version.h"
@@ -27,6 +27,118 @@
 
 namespace Spectra {
 
+// Helper class to restart Arnoldi factorization
+//
+// Given the current upper Hessenberg matrix H and a number of
+// shifts mu[1], ..., mu[n]:
+//
+// 1. Compute QR decomposition H - mu[i] * I = Qi * Ri
+// 2. Update Q <- Q * Qi
+// 3. Update H <- Qi^H * H * Qi
+//
+// The updated H has the same eigenvalues as the original one,
+// but typically the new H is closer to a diagonal matrix
+//
+// Default implementation for real type
+template <typename Scalar, typename ArnoldiFac>
+class RestartArnoldi
+{
+private:
+    using Index = Eigen::Index;
+    using Complex = std::complex<Scalar>;
+    using Matrix = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
+    using ComplexVector = Eigen::Matrix<Complex, Eigen::Dynamic, 1>;
+
+    // Real Ritz values calculated from UpperHessenbergEigen have exact zero imaginary part
+    // Complex Ritz values have exact conjugate pairs
+    // So we use exact tests here
+    static bool is_complex(const Complex& v) { return v.imag() != Scalar(0); }
+    static bool is_conj(const Complex& v1, const Complex& v2) { return v1 == Eigen::numext::conj(v2); }
+
+public:
+    // Shifts are ritz_val[k], ritz_val[k+1], ...
+    static void run(const ComplexVector& ritz_val, Index k, ArnoldiFac& fac, Matrix& Q)
+    {
+        using std::norm;
+
+        const Index ncv = ritz_val.size();
+        DoubleShiftQR<Scalar> decomp_ds(ncv);
+        UpperHessenbergQR<Scalar> decomp_hb(ncv);
+
+        for (Index i = k; i < ncv; i++)
+        {
+            if (is_complex(ritz_val[i]) && is_conj(ritz_val[i], ritz_val[i + 1]))
+            {
+                // For real-valued H and two conjugate shifts mu, conj(mu),
+                // H - mu * I = Q * R may be a complex-valued QR decomposition,
+                // which is costly in computation
+                //
+                // Instead, we can apply two conjugate shifts simultaneously, i.e.,
+                // (H - mu * I) * (H - conj(mu) * I) = Q * R, and then update
+                // H <- Q'HQ
+                //
+                // This is called a double shift QR decomposition
+                // (H - mu * I) * (H - conj(mu) * I) = H^2 - 2 * Re(mu) * H + |mu|^2 * I
+                const Scalar s = Scalar(2) * ritz_val[i].real();
+                const Scalar t = norm(ritz_val[i]);
+                decomp_ds.compute(fac.matrix_H(), s, t);
+
+                // Q <- Q * Qi
+                decomp_ds.apply_YQ(Q);
+                // H <- Qi' * H * Qi
+                // Matrix Q = Matrix::Identity(ncv, ncv);
+                // decomp_ds.apply_YQ(Q);
+                // fac_H = Q.transpose() * fac_H * Q;
+                fac.compress_H(decomp_ds);
+
+                i++;
+            }
+            else
+            {
+                // QR decomposition of H - mu[i] * I, mu[i] is real
+                decomp_hb.compute(fac.matrix_H(), ritz_val[i].real());
+
+                // Q <- Q * Qi
+                decomp_hb.apply_YQ(Q);
+                // H <- Qi' * H * Qi = Ri * Qi + mu[i] * I
+                fac.compress_H(decomp_hb);
+            }
+        }
+    }
+};
+
+// Partial specialization for complex-valued matrices
+template <typename RealScalar, typename ArnoldiFac>
+class RestartArnoldi<std::complex<RealScalar>, ArnoldiFac>
+{
+private:
+    using Index = Eigen::Index;
+    using Scalar = std::complex<RealScalar>;
+    using Complex = Scalar;
+    using Matrix = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
+    using ComplexVector = Eigen::Matrix<Complex, Eigen::Dynamic, 1>;
+
+public:
+    static void run(const ComplexVector& ritz_val, Index k, ArnoldiFac& fac, Matrix& Q)
+    {
+        const Index ncv = ritz_val.size();
+        // This is the complex-valued QR decomposition
+        UpperHessenbergQR<Scalar> decomp_hb(ncv);
+
+        // For complex-valued H, simply apply complex shifts mu[i] one by one
+        for (Index i = k; i < ncv; i++)
+        {
+            // QR decomposition of H - mu[i] * I
+            decomp_hb.compute(fac.matrix_H(), ritz_val[i]);
+
+            // Q <- Q * Qi
+            decomp_hb.apply_YQ(Q);
+            // H <- Qi^H * H * Qi = Ri * Qi + mu[i] * I
+            fac.compress_H(decomp_hb);
+        }
+    }
+};
+
 ///
 /// \ingroup EigenSolver
 ///
@@ -38,22 +150,28 @@ template <typename OpType, typename BOpType>
 class GenEigsBase
 {
 private:
+    // Scalar is the type of the matrix element
+    // Can be real or complex
     using Scalar = typename OpType::Scalar;
+    // The real part type of the matrix element, e.g.,
+    //     Scalar = double               => RealScalar = double
+    //     Scalar = std::complex<double> => RealScalar = double
+    using RealScalar = typename Eigen::NumTraits<Scalar>::Real;
+    // The eigenvalues are known to be complex numbers
+    using Complex = std::complex<RealScalar>;
     using Index = Eigen::Index;
     using Matrix = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
     using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
-    using Array = Eigen::Array<Scalar, Eigen::Dynamic, 1>;
+    using ComplexMatrix = Eigen::Matrix<Complex, Eigen::Dynamic, Eigen::Dynamic>;
+    using ComplexVector = Eigen::Matrix<Complex, Eigen::Dynamic, 1>;
+    using RealArray = Eigen::Array<RealScalar, Eigen::Dynamic, 1>;
     using BoolArray = Eigen::Array<bool, Eigen::Dynamic, 1>;
     using MapMat = Eigen::Map<Matrix>;
     using MapVec = Eigen::Map<Vector>;
     using MapConstVec = Eigen::Map<const Vector>;
 
-    using Complex = std::complex<Scalar>;
-    using ComplexMatrix = Eigen::Matrix<Complex, Eigen::Dynamic, Eigen::Dynamic>;
-    using ComplexVector = Eigen::Matrix<Complex, Eigen::Dynamic, 1>;
-
-    using ArnoldiOpType = ArnoldiOp<Scalar, OpType, BOpType>;
-    using ArnoldiFac = Arnoldi<Scalar, ArnoldiOpType>;
+    using ArnoldiOpType = ArnoldiOp<OpType, BOpType>;
+    using ArnoldiFac = Arnoldi<ArnoldiOpType>;
 
 protected:
     // clang-format off
@@ -90,67 +208,33 @@ private:
         if (k >= m_ncv)
             return;
 
-        DoubleShiftQR<Scalar> decomp_ds(m_ncv);
-        UpperHessenbergQR<Scalar> decomp_hb(m_ncv);
+        // Use Q to collect orthogonal transformations
         Matrix Q = Matrix::Identity(m_ncv, m_ncv);
-
-        for (Index i = k; i < m_ncv; i++)
-        {
-            if (is_complex(m_ritz_val[i]) && is_conj(m_ritz_val[i], m_ritz_val[i + 1]))
-            {
-                // H - mu * I = Q1 * R1
-                // H <- R1 * Q1 + mu * I = Q1' * H * Q1
-                // H - conj(mu) * I = Q2 * R2
-                // H <- R2 * Q2 + conj(mu) * I = Q2' * H * Q2
-                //
-                // (H - mu * I) * (H - conj(mu) * I) = Q1 * Q2 * R2 * R1 = Q * R
-                const Scalar s = Scalar(2) * m_ritz_val[i].real();
-                const Scalar t = norm(m_ritz_val[i]);
-
-                decomp_ds.compute(m_fac.matrix_H(), s, t);
-
-                // Q -> Q * Qi
-                decomp_ds.apply_YQ(Q);
-                // H -> Q'HQ
-                // Matrix Q = Matrix::Identity(m_ncv, m_ncv);
-                // decomp_ds.apply_YQ(Q);
-                // m_fac_H = Q.transpose() * m_fac_H * Q;
-                m_fac.compress_H(decomp_ds);
-
-                i++;
-            }
-            else
-            {
-                // QR decomposition of H - mu * I, mu is real
-                decomp_hb.compute(m_fac.matrix_H(), m_ritz_val[i].real());
-
-                // Q -> Q * Qi
-                decomp_hb.apply_YQ(Q);
-                // H -> Q'HQ = RQ + mu * I
-                m_fac.compress_H(decomp_hb);
-            }
-        }
-
+        // Apply shifts and update H and Q
+        RestartArnoldi<Scalar, ArnoldiFac>::run(m_ritz_val, k, m_fac, Q);
+        // Apply orthogonal transformation to V, V <- V * Q
         m_fac.compress_V(Q);
+        // It can be verified that the updated V and H admit a k-step
+        // Arnoldi factorization, and we expand it to m-step
         m_fac.factorize_from(k, m_ncv, m_nmatop);
-
+        // Retrieve the new Ritz pairs
         retrieve_ritzpair(selection);
     }
 
     // Calculates the number of converged Ritz values
-    Index num_converged(const Scalar& tol)
+    Index num_converged(const RealScalar& tol)
     {
         using std::pow;
 
         // The machine precision, ~= 1e-16 for the "double" type
-        const Scalar eps = TypeTraits<Scalar>::epsilon();
+        const RealScalar eps = TypeTraits<RealScalar>::epsilon();
         // std::pow() is not constexpr, so we do not declare eps23 to be constexpr
         // But most compilers should be able to compute eps23 at compile time
-        const Scalar eps23 = pow(eps, Scalar(2) / 3);
+        const RealScalar eps23 = pow(eps, RealScalar(2) / 3);
 
         // thresh = tol * max(eps23, abs(theta)), theta for Ritz value
-        Array thresh = tol * m_ritz_val.head(m_nev).array().abs().max(eps23);
-        Array resid = m_ritz_est.head(m_nev).array().abs() * m_fac.f_norm();
+        RealArray thresh = tol * m_ritz_val.head(m_nev).array().abs().max(eps23);
+        RealArray resid = m_ritz_est.head(m_nev).array().abs() * m_fac.f_norm();
         // Converged "wanted" Ritz values
         m_ritz_conv = (resid < thresh);
 
@@ -164,7 +248,7 @@ private:
 
         // A very small value, but 1.0 / near_0 does not overflow
         // ~= 1e-307 for the "double" type
-        const Scalar near_0 = TypeTraits<Scalar>::min() * Scalar(10);
+        const RealScalar near_0 = TypeTraits<RealScalar>::min() * RealScalar(10);
 
         Index nev_new = m_nev;
         for (Index i = m_nev; i < m_ncv; i++)
@@ -415,7 +499,7 @@ public:
     /// \return Number of converged eigenvalues.
     ///
     Index compute(SortRule selection = SortRule::LargestMagn, Index maxit = 1000,
-                  Scalar tol = 1e-10, SortRule sorting = SortRule::LargestMagn)
+                  RealScalar tol = 1e-10, SortRule sorting = SortRule::LargestMagn)
     {
         // The m-step Arnoldi factorization
         m_fac.factorize_from(1, m_ncv, m_nmatop);
@@ -434,7 +518,7 @@ public:
         // Sorting results
         sort_ritzpair(sorting);
 
-        m_niter += i + 1;
+        m_niter += (i + 1);
         m_info = (nconv >= m_nev) ? CompInfo::Successful : CompInfo::NotConverging;
 
         return (std::min)(m_nev, nconv);

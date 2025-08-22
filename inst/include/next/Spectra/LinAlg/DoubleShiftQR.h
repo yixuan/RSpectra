@@ -1,4 +1,4 @@
-// Copyright (C) 2016-2023 Yixuan Qiu <yixuan.qiu@cos.name>
+// Copyright (C) 2016-2025 Yixuan Qiu <yixuan.qiu@cos.name>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
@@ -8,10 +8,9 @@
 #define SPECTRA_DOUBLE_SHIFT_QR_H
 
 #include <Eigen/Core>
-#include <vector>     // std::vector
-#include <algorithm>  // std::min, std::fill, std::copy
-#include <utility>    // std::swap
 #include <cmath>      // std::abs, std::sqrt, std::pow
+#include <vector>     // std::vector
+#include <algorithm>  // std::min, std::fill, std::copy, std::swap
 #include <stdexcept>  // std::invalid_argument, std::logic_error
 
 #include "../Util/TypeTraits.h"
