@@ -1,4 +1,4 @@
-#define USE_SPECTRA_1YZ
+#define PREFER_SPECTRA_1YZ
 
 #include <RcppEigen.h>
 #include <GenEigs.h>
