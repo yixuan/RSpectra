@@ -77,6 +77,7 @@ RcppExport SEXP svds_sym(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
         Rcpp::Named("d")     = d,
         Rcpp::Named("u")     = u_ret,
         Rcpp::Named("v")     = v_ret,
+        Rcpp::Named("nconv") = nconv,
         Rcpp::Named("niter") = eigs.num_iterations(),
         Rcpp::Named("nops")  = eigs.num_operations()
     );
@@ -197,6 +198,7 @@ RcppExport SEXP svds_gen(SEXP A_mat_r, SEXP m_scalar_r, SEXP n_scalar_r,
         Rcpp::Named("d")     = d,
         Rcpp::Named("u")     = u_ret,
         Rcpp::Named("v")     = v_ret,
+        Rcpp::Named("nconv") = nconv,
         Rcpp::Named("niter") = eigs.num_iterations(),
         Rcpp::Named("nops")  = eigs.num_operations() * 2 + nops
     );

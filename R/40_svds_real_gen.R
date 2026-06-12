@@ -8,6 +8,7 @@ svds_fallback_A_Atrans <- function(A, Atrans, m, n, nu, nv, fun_args,
     wd = min(m, n)
     nu = min(nu, wd)
     nv = min(nv, wd)
+    nops = 0
 
     # Apply centering and scaling: B = (A - 1c')S
     # B*x = A*(x/scl) - sum(x * ctr / scl) * 1
@@ -40,6 +41,7 @@ svds_fallback_A_Atrans <- function(A, Atrans, m, n, nu, nv, fun_args,
             ej[j] = 1
             AtA[, j] = Atrans(A(ej, fun_args), fun_args)
         }
+        nops = nops + 2 * n
         # Eigenvalues are sigma^2, eigenvectors are V
         eig = eigen(AtA, symmetric = TRUE)
         d = sqrt(pmax(eig$values, 0))
@@ -52,7 +54,10 @@ svds_fallback_A_Atrans <- function(A, Atrans, m, n, nu, nv, fun_args,
             for (i in seq_len(nu))
             {
                 if (d[i] > 0)
+                {
                     U[, i] = A(V[, i], fun_args) / d[i]
+                    nops = nops + 1
+                }
             }
         } else {
             U = NULL
@@ -66,6 +71,7 @@ svds_fallback_A_Atrans <- function(A, Atrans, m, n, nu, nv, fun_args,
             ej[j] = 1
             AAt[, j] = A(Atrans(ej, fun_args), fun_args)
         }
+        nops = nops + 2 * m
         eig = eigen(AAt, symmetric = TRUE)
         d = sqrt(pmax(eig$values, 0))
         U = eig$vectors
@@ -77,7 +83,10 @@ svds_fallback_A_Atrans <- function(A, Atrans, m, n, nu, nv, fun_args,
             for (i in seq_len(nv))
             {
                 if (d[i] > 0)
+                {
                     V[, i] = Atrans(U[, i], fun_args) / d[i]
+                    nops = nops + 1
+                }
             }
         } else {
             V = NULL
@@ -88,7 +97,8 @@ svds_fallback_A_Atrans <- function(A, Atrans, m, n, nu, nv, fun_args,
          u = if (nu > 0) U else NULL,
          v = if (nv > 0) V else NULL,
          nconv = wd,
-         niter = 0)
+         niter = 0,
+         nops = nops)
 }
 
 svds_real_gen <- function(A, k, nu, nv, opts, mattype, extra_args = list())
@@ -167,7 +177,7 @@ svds_real_gen <- function(A, k, nu, nv, opts, mattype, extra_args = list())
         if (isTRUE(opts$scale))
             Asvds = sweep(Asvds, 2, scl, "/")
         return(c(svd(Asvds, nu = nu, nv = nv),
-                 nconv = wd, niter = 0))
+                 nconv = wd, niter = 0, nops = 0))
     }
 
     # Matrix will be passed to C++, so we need to check the type.
