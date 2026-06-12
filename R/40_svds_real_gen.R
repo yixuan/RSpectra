@@ -1,11 +1,34 @@
 # Fallback for full SVD when A is a function interface (k == min(m, n)).
 # Recover A'A or AA' by applying A/Atrans to standard basis vectors,
 # then use eigen(symmetric=TRUE) to obtain singular values and vectors.
-svds_fallback_A_Atrans <- function(A, Atrans, m, n, nu, nv, fun_args)
+svds_fallback_A_Atrans <- function(A, Atrans, m, n, nu, nv, fun_args,
+                                   do_center = FALSE, do_scale = FALSE,
+                                   ctr = rep(0, n), scl = rep(1, n))
 {
     wd = min(m, n)
     nu = min(nu, wd)
     nv = min(nv, wd)
+
+    # Apply centering and scaling: B = (A - 1c')S
+    # B*x = A*(x/scl) - sum(x * ctr / scl) * 1
+    # B'*y = (A'y - sum(y) * ctr) / scl
+    if (do_center || do_scale)
+    {
+        A_raw = A
+        Atrans_raw = Atrans
+        A = function(x, args) {
+            xs = x / scl
+            res = A_raw(xs, args)
+            if (do_center) res = res - sum(xs * ctr)
+            res
+        }
+        Atrans = function(x, args) {
+            res = Atrans_raw(x, args)
+            if (do_center) res = (res - sum(x) * ctr) / scl
+            else           res = res / scl
+            res
+        }
+    }
 
     if (m > n)
     {
@@ -132,7 +155,10 @@ svds_real_gen <- function(A, k, nu, nv, opts, mattype, extra_args = list())
         if (mattype == "function") {
             return(svds_fallback_A_Atrans(A, extra_args$Atrans,
                                           m, n, nu, nv,
-                                          extra_args$fun_args))
+                                          extra_args$fun_args,
+                                          do_center = isTRUE(opts$center),
+                                          do_scale  = isTRUE(opts$scale),
+                                          ctr = ctr, scl = scl))
         }
         # Apply centering and scaling if requested: B = (A - 1c')S
         Asvds = A
