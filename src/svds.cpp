@@ -30,7 +30,7 @@ RcppExport SEXP svds_sym(SEXP A_mat_r, SEXP n_scalar_r, SEXP k_scalar_r,
 
     SymEigsSolver<MatProd> eigs(*op, k, ncv);
     eigs.init();
-    int nconv = eigs.compute(SortRule::LargestMagn, maxitr, tol);
+    int nconv = eigs.compute(SortRule::LargestMagn, maxitr, tol, SortRule::LargestMagn);
     if(nconv < k)
         Rcpp::warning("only %d singular values converged, less than k = %d", nconv, k);
 

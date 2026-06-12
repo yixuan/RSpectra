@@ -8,6 +8,14 @@
       \item Updated all internal code to be compatible with Spectra v1.2.0.
     }
   }
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item Fixed a bug in \code{svds()} that singular values were not in
+            descending order when the input matrix was symmetric and had
+            negative eigenvalues with large magnitude
+            (\href{https://github.com/yixuan/RSpectra/issues/29}{#29}).
+    }
+  }
 }
 
 \section{Changes in RSpectra version 0.16-2}{
