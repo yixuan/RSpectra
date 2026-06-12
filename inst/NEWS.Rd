@@ -10,15 +10,20 @@
   }
   \subsection{BUG FIXES}{
     \itemize{
-      \item Fixed a bug in \code{svds()} that singular values were not in
-            descending order when the input matrix was symmetric and had
-            negative eigenvalues with large magnitude
-            (\href{https://github.com/yixuan/RSpectra/issues/29}{#29}).
       \item Fixed a bug in \code{svds()} that the \code{center} and
             \code{scale} parameters in \code{opts} were ignored when
             \code{k == min(nrow(A), ncol(A))}, because the
             \code{svd()} fallback did not apply the centering and scaling
             transformation.
+      \item Fixed a bug in \code{svds()} that requesting all singular values
+            (\code{k == min(nrow(A), ncol(A))}) with the function interface
+            caused an error, because the \code{svd()} fallback received a
+            closure instead of a matrix
+            (\href{https://github.com/yixuan/RSpectra/issues/25}{#25}).
+      \item Fixed a bug in \code{svds()} that singular values were not in
+            descending order when the input matrix was symmetric and had
+            negative eigenvalues with large magnitude
+            (\href{https://github.com/yixuan/RSpectra/issues/29}{#29}).
     }
   }
 }

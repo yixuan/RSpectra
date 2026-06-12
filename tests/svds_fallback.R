@@ -17,3 +17,22 @@ s1 <- svds(A, k, opts = list(center = ctr, scale = scl))
 
 stopifnot(max(abs(s0$d - s1$d)) < 1e-10)
 cat("OK: svds() with center/scale matches svd() when k == min(m, n)\n")
+
+## Test that svds() with function interface works when k == min(m, n)
+## (previously the svd() fallback would error because A is a closure)
+
+set.seed(123)
+m <- 8
+n <- 5
+k <- min(m, n)
+A <- matrix(rnorm(m * n), m)
+Atrans <- t(A)
+s0 <- svd(A)
+
+fun_A  <- function(x, args) as.numeric(args %*% x)
+fun_At <- function(x, args) as.numeric(crossprod(args, x))
+
+s1 <- svds(fun_A, k, Atrans = fun_At, dim = c(m, n), args = A)
+
+stopifnot(max(abs(s0$d - s1$d)) < 1e-10)
+cat("OK: svds() function interface matches svd() when k == min(m, n)\n")

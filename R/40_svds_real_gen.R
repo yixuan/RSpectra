@@ -1,3 +1,73 @@
+# Fallback for full SVD when A is a function interface (k == min(m, n)).
+# Recover A'A or AA' by applying A/Atrans to standard basis vectors,
+# then use eigen(symmetric=TRUE) to obtain singular values and vectors.
+svds_fallback_A_Atrans <- function(A, Atrans, m, n, nu, nv, fun_args)
+{
+    wd = min(m, n)
+    nu = min(nu, wd)
+    nv = min(nv, wd)
+
+    if (m > n)
+    {
+        # Form A'A (n x n): column j = Atrans(A(e_j))
+        AtA = matrix(0, n, n)
+        for (j in seq_len(n))
+        {
+            ej = numeric(n)
+            ej[j] = 1
+            AtA[, j] = Atrans(A(ej, fun_args), fun_args)
+        }
+        # Eigenvalues are sigma^2, eigenvectors are V
+        eig = eigen(AtA, symmetric = TRUE)
+        d = sqrt(pmax(eig$values, 0))
+        V = eig$vectors
+        # Compute U = A * V * diag(1/d)
+        # Only the first nu columns are needed
+        if (nu > 0)
+        {
+            U = matrix(0, m, nu)
+            for (i in seq_len(nu))
+            {
+                if (d[i] > 0)
+                    U[, i] = A(V[, i], fun_args) / d[i]
+            }
+        } else {
+            U = NULL
+        }
+    } else {
+        # Form AA' (m x m): column j = A(Atrans(e_j))
+        AAt = matrix(0, m, m)
+        for (j in seq_len(m))
+        {
+            ej = numeric(m)
+            ej[j] = 1
+            AAt[, j] = A(Atrans(ej, fun_args), fun_args)
+        }
+        eig = eigen(AAt, symmetric = TRUE)
+        d = sqrt(pmax(eig$values, 0))
+        U = eig$vectors
+        # Compute V = Atrans * U * diag(1/d)
+        # Only the first nv columns are needed
+        if (nv > 0)
+        {
+            V = matrix(0, n, nv)
+            for (i in seq_len(nv))
+            {
+                if (d[i] > 0)
+                    V[, i] = Atrans(U[, i], fun_args) / d[i]
+            }
+        } else {
+            V = NULL
+        }
+    }
+
+    list(d = d,
+         u = if (nu > 0) U else NULL,
+         v = if (nv > 0) V else NULL,
+         nconv = wd,
+         niter = 0)
+}
+
 svds_real_gen <- function(A, k, nu, nv, opts, mattype, extra_args = list())
 {
     if (mattype == "function")
@@ -59,6 +129,11 @@ svds_real_gen <- function(A, k, nu, nv, opts, mattype, extra_args = list())
     if (k == wd)
     {
         warning("all singular values are requested, svd() is used instead")
+        if (mattype == "function") {
+            return(svds_fallback_A_Atrans(A, extra_args$Atrans,
+                                          m, n, nu, nv,
+                                          extra_args$fun_args))
+        }
         # Apply centering and scaling if requested: B = (A - 1c')S
         Asvds = A
         if (isTRUE(opts$center))
