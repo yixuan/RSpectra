@@ -14,6 +14,11 @@
             descending order when the input matrix was symmetric and had
             negative eigenvalues with large magnitude
             (\href{https://github.com/yixuan/RSpectra/issues/29}{#29}).
+      \item Fixed a bug in \code{svds()} that the \code{center} and
+            \code{scale} parameters in \code{opts} were ignored when
+            \code{k == min(nrow(A), ncol(A))}, because the
+            \code{svd()} fallback did not apply the centering and scaling
+            transformation.
     }
   }
 }
