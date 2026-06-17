@@ -95,13 +95,13 @@ A list of converged eigenvalues and eigenvectors.
 }
 \description{
 Given an \eqn{n} by \eqn{n} matrix \eqn{A},
-function \code{eigs()} can calculate a specified
+functions \code{eigs()} and \code{eigs_sym()} can calculate a specified
 number of eigenvalues and eigenvectors of \eqn{A}.
 Users can specify the selection criterion by argument
 \code{which}, e.g., choosing the \eqn{k} largest or smallest
 eigenvalues and the corresponding eigenvectors.
 
-Currently \code{eigs()} supports matrices of the following classes:
+Currently \code{eigs()} and \code{eigs_sym()} support matrices of the following classes:
 
 \tabular{ll}{
   \code{matrix}     \tab The most commonly used matrix type,
@@ -127,13 +127,13 @@ Currently \code{eigs()} supports matrices of the following classes:
 \code{eigs_sym()} assumes the matrix is symmetric,
 and only the lower triangle (or upper triangle, which is
 controlled by the argument \code{lower}) is used for
-computation, which guarantees that the eigenvalues and eigenvectors are
-real, and in general results in faster and more stable computation.
+computation. For symmetric matrix types (\code{dsyMatrix}, \code{dsCMatrix},
+and \code{dsRMatrix}), if \code{lower} conflicts with \code{A@uplo},
+then a warning will be issued, and \code{A@uplo} will be used.
+\code{eigs_sym()} guarantees that the eigenvalues and eigenvectors are
+real-valued, and in general results in faster and more stable computation.
 One exception is when \code{A} is a function, in which case the user is
 responsible for the symmetry of the operator.
-
-\code{eigs_sym()} supports "matrix", "dgeMatrix", "dgCMatrix", "dgRMatrix",
-"dsCMatrix", "dsRMatrix", and "function" typed matrices.
 }
 \details{
 The \code{which} argument is a character string
@@ -157,12 +157,13 @@ Possible values are:
               and then from the low end.
 }
 
-\code{eigs()} with matrix types "matrix", "dgeMatrix", "dgCMatrix"
-and "dgRMatrix" can use "LM", "SM", "LR", "SR", "LI" and "SI".
+\code{eigs()} with matrix types \code{matrix}, \code{dgeMatrix}, \code{dgCMatrix}
+and \code{dgRMatrix} can use "LM", "SM", "LR", "SR", "LI" and "SI".
 
 \code{eigs_sym()} with all supported matrix types,
 and \code{eigs()} with symmetric matrix types
-("dsyMatrix", "dsCMatrix", and "dsRMatrix") can use "LM", "SM", "LA", "SA" and "BE".
+(\code{dsyMatrix}, \code{dsCMatrix}, and \code{dsRMatrix})
+can use "LM", "SM", "LA", "SA" and "BE".
 
 The \code{opts} argument is a list that can supply any of the
 following parameters:
@@ -228,7 +229,7 @@ library(Matrix)
 n = 20
 k = 5
 
-## general matrices have complex eigenvalues
+## General matrices have complex eigenvalues
 set.seed(111)
 A1 = matrix(rnorm(n^2), n)  ## class "matrix"
 A2 = Matrix(A1)             ## class "dgeMatrix"
