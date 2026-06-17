@@ -6,6 +6,9 @@
     \itemize{
       \item Updated Spectra to v1.2.0.
       \item Updated all internal code to be compatible with Spectra v1.2.0.
+      \item \code{eigs_sym()} now supports the symmetric sparse matrix types
+            \strong{dsCMatrix} and \strong{dsRMatrix}
+            (\href{https://github.com/yixuan/RSpectra/issues/24}{#24}).
     }
   }
   \subsection{BUG FIXES}{

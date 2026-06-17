@@ -39,8 +39,8 @@
 ##' One exception is when \code{A} is a function, in which case the user is
 ##' responsible for the symmetry of the operator.
 ##'
-##' \code{eigs_sym()} supports "matrix", "dgeMatrix", "dgCMatrix", "dgRMatrix"
-##' and "function" typed matrices.
+##' \code{eigs_sym()} supports "matrix", "dgeMatrix", "dgCMatrix", "dgRMatrix",
+##' "dsCMatrix", "dsRMatrix", and "function" typed matrices.
 ##'
 ##' @param A The matrix whose eigenvalues/vectors are to be computed.
 ##'          It can also be a function which receives a vector \eqn{x}
@@ -361,6 +361,32 @@ eigs_sym.dgRMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(),
 {
     eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_dgRMatrix",
                   extra_args = list(use_lower = as.logical(lower)))
+}
+
+eigs_sym.dsCMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(),
+                               lower = TRUE, ...)
+{
+    ## `dsCMatrix` is always symmetric, with the stored triangle given by the
+    ## `uplo` slot. Warn if `lower` conflicts with `uplo`, and use `uplo`.
+    use_lower = (A@uplo == "L")
+    if (isTRUE(lower) != use_lower)
+        warning("argument 'lower' conflicts with the 'uplo' slot of A (\"",
+                A@uplo, "\"); using 'uplo'")
+    eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_dgCMatrix",
+                  extra_args = list(use_lower = use_lower))
+}
+
+eigs_sym.dsRMatrix <- function(A, k, which = "LM", sigma = NULL, opts = list(),
+                               lower = TRUE, ...)
+{
+    ## `dsRMatrix` is always symmetric, with the stored triangle given by the
+    ## `uplo` slot. Warn if `lower` conflicts with `uplo`, and use `uplo`.
+    use_lower = (A@uplo == "L")
+    if (isTRUE(lower) != use_lower)
+        warning("argument 'lower' conflicts with the 'uplo' slot of A (\"",
+                A@uplo, "\"); using 'uplo'")
+    eigs_real_sym(A, nrow(A), k, which, sigma, opts, mattype = "sym_dgRMatrix",
+                  extra_args = list(use_lower = use_lower))
 }
 
 ##' @rdname eigs

@@ -132,8 +132,8 @@ real, and in general results in faster and more stable computation.
 One exception is when \code{A} is a function, in which case the user is
 responsible for the symmetry of the operator.
 
-\code{eigs_sym()} supports "matrix", "dgeMatrix", "dgCMatrix", "dgRMatrix"
-and "function" typed matrices.
+\code{eigs_sym()} supports "matrix", "dgeMatrix", "dgCMatrix", "dgRMatrix",
+"dsCMatrix", "dsRMatrix", and "function" typed matrices.
 }
 \details{
 The \code{which} argument is a character string
